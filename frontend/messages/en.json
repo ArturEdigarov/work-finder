@@ -45,5 +45,18 @@
     "telegram_not_configured": "The bot is not configured on the server yet.",
     "validation_error": "Please check the form fields.",
     "unknown_error": "Something went wrong. Please try again."
+  },
+  "llm": {
+    "title": "Claude (AI)",
+    "active": "Active.",
+    "paused": "Paused until {until}: subscription limit reached. Tasks are queued.",
+    "unavailable": "Not available for this account.",
+    "today": "Used today",
+    "kinds": {
+      "parse": "CV parsing",
+      "score": "Vacancy scoring",
+      "draft": "Letters & CV",
+      "check": "Health check"
+    }
   }
 }

@@ -13,6 +13,7 @@ Callers (future procrastinate tasks) handle `LLMDeferred` by rescheduling to `re
 
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
+from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Literal, Protocol
 from zoneinfo import ZoneInfo
@@ -28,6 +29,7 @@ from app.db.models import LlmState, LlmUsage, Role, User
 from app.llm.provider import (
     LLMAuthError,
     LLMInvalidOutput,
+    LLMKind,
     LLMProvider,
     LLMRateLimited,
     LLMRequest,
@@ -51,6 +53,22 @@ class LLMDeferred(Exception):
         super().__init__(f"{reason}, retry at {retry_at.isoformat()}")
         self.retry_at = retry_at
         self.reason = reason
+
+
+@dataclass(frozen=True)
+class KindUsage:
+    kind: LLMKind
+    used: int
+    cap: int
+
+
+@dataclass(frozen=True)
+class LlmStatus:
+    provider: str
+    available: bool  # False: this user may not use the configured provider
+    paused_until: datetime | None
+    day: date
+    usage: list[KindUsage]
 
 
 class AdminNotifier(Protocol):
@@ -109,6 +127,30 @@ class LLMGate:
             **result.usage,
         )
         return result
+
+    async def status(self, db: AsyncSession, user: User) -> LlmStatus:
+        """What the user sees: is the LLM available, paused until when, today's usage."""
+        now = self._clock()
+        day = now.astimezone(self._tz).date()
+        paused_until = await db.scalar(
+            select(LlmState.paused_until).where(LlmState.provider == self._provider.name)
+        )
+        rows = await db.execute(
+            select(LlmUsage.kind, LlmUsage.count).where(
+                LlmUsage.user_id == user.id, LlmUsage.day == day
+            )
+        )
+        used = {kind: count for kind, count in rows}
+        return LlmStatus(
+            provider=self._provider.name,
+            available=not self._provider.subscription or user.role == Role.OWNER,
+            paused_until=paused_until if paused_until and paused_until > now else None,
+            day=day,
+            usage=[
+                KindUsage(kind=k, used=used.get(k, 0), cap=self._settings.llm_daily_cap(k))
+                for k in LLMKind
+            ],
+        )
 
     # --- checks -------------------------------------------------------------------------
 

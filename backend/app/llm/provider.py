@@ -19,6 +19,7 @@ class LLMKind(enum.StrEnum):
     PARSE = "parse"  # CV → structured profile
     SCORE = "score"  # vacancy fit
     DRAFT = "draft"  # cover letter + CV adaptation
+    CHECK = "check"  # `make llm-check` health check
 
 
 @dataclass(frozen=True, kw_only=True)

@@ -44,7 +44,7 @@ Currently a pet project with one user (owner); architected multi-user from day o
 - **NO API KEYS. Subscription only.** LLM calls go only through Claude Code on the owner's Claude Pro subscription. Never add, read, or require `ANTHROPIC_API_KEY`; every process **force-unsets** it at startup and before spawning `claude`.
 - **All LLM calls go through `LLMGate`** (`backend/app/llm/gate.py`). No direct provider calls anywhere else.
 - **On rate limit — STOP.** Set `paused_until`, stop calling Claude, send ONE Telegram message ("лимит, продолжу позже"), keep vacancies queued and process them after reset.
-- **Daily caps** per kind (`parse`, `score`, `draft`) are enforced by the gate.
+- **Daily caps** per kind (`parse`, `score`, `draft`, service `check`) are enforced by the gate.
 - **Subscription provider is owner-only.** Other users may never be served via the owner's subscription — only via a future API provider.
 - No paid services without explicit approval. Hosting in the EU (Mac now, ~5 € VPS later).
 - Cheap non-LLM prefilter (keywords, language, location radius, salary) always runs before any LLM call.

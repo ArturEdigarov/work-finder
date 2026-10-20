@@ -1,6 +1,6 @@
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file .env
 
-.PHONY: db-up db-down migrate api bot web test lint check gen-types keygen
+.PHONY: db-up db-down migrate api bot web test lint check gen-types keygen llm-check
 
 db-up:
 	$(COMPOSE) up -d --wait
@@ -35,3 +35,7 @@ gen-types:
 
 keygen:
 	cd backend && uv run python -m app.core.keygen
+
+# One tiny real Claude call through LLMGate (counts against the daily `check` cap)
+llm-check:
+	cd backend && uv run python -m app.llm.check

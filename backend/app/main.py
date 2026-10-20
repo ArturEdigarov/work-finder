@@ -4,7 +4,7 @@ enforce_no_api_key()  # must run before anything else — see CLAUDE.md "Hard Ru
 
 from fastapi import FastAPI  # noqa: E402
 
-from app.api.routers import auth, me  # noqa: E402
+from app.api.routers import auth, llm, me  # noqa: E402
 from app.core.logging import configure_logging  # noqa: E402
 
 
@@ -13,6 +13,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title="work-service", version="0.1.0")
     app.include_router(auth.router)
     app.include_router(me.router)
+    app.include_router(llm.router)
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:

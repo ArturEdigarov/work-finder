@@ -49,7 +49,7 @@ def test_request_exposes_json_schema() -> None:
 
 def test_per_kind_settings() -> None:
     settings = get_settings()
-    assert [settings.llm_daily_cap(k) for k in LLMKind] == [5, 30, 8]
+    assert [settings.llm_daily_cap(k) for k in LLMKind] == [5, 30, 8, 3]
     assert {settings.llm_model(k) for k in LLMKind} == {"sonnet"}
 
 

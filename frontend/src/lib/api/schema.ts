@@ -142,6 +142,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/llm/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Llm Status */
+        get: operations["llm_status_llm_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -177,6 +194,34 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** LlmKindUsageOut */
+        LlmKindUsageOut: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "parse" | "score" | "draft" | "check";
+            /** Used */
+            used: number;
+            /** Cap */
+            cap: number;
+        };
+        /** LlmStatusOut */
+        LlmStatusOut: {
+            /** Provider */
+            provider: string;
+            /** Available */
+            available: boolean;
+            /** Paused Until */
+            paused_until: string | null;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Usage */
+            usage: components["schemas"]["LlmKindUsageOut"][];
         };
         /** LoginIn */
         LoginIn: {
@@ -506,6 +551,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    llm_status_llm_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LlmStatusOut"];
                 };
             };
         };

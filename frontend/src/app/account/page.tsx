@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
+import { LlmStatus } from "@/components/LlmStatus";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { isLocale, setLocaleCookie, type Locale } from "@/i18n/config";
 import { api, errorCode, type User } from "@/lib/api/client";
@@ -133,6 +134,8 @@ export default function AccountPage() {
           </>
         )}
       </section>
+
+      <LlmStatus />
 
       {error && <p className="error">{error}</p>}
 

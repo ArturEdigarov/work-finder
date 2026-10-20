@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
@@ -47,3 +47,17 @@ class ConsentInfoOut(BaseModel):
 
 class ErrorOut(BaseModel):
     detail: str
+
+
+class LlmKindUsageOut(BaseModel):
+    kind: Literal["parse", "score", "draft", "check"]
+    used: int
+    cap: int
+
+
+class LlmStatusOut(BaseModel):
+    provider: str
+    available: bool
+    paused_until: datetime | None
+    day: date
+    usage: list[LlmKindUsageOut]

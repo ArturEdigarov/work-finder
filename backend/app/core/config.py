@@ -47,10 +47,12 @@ class Settings(BaseSettings):
     llm_model_parse: str = "sonnet"
     llm_model_score: str = "sonnet"
     llm_model_draft: str = "sonnet"
+    llm_model_check: str = "sonnet"
     # Our own daily caps, so the service never eats the whole subscription limit.
     llm_daily_cap_parse: int = 5
     llm_daily_cap_score: int = 30
     llm_daily_cap_draft: int = 8
+    llm_daily_cap_check: int = 3
     # Pause when the provider reports a limit without a reset time:
     # first pause = default, then doubled per consecutive hit, capped at max.
     llm_pause_default_minutes: int = 60

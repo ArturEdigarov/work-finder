@@ -137,7 +137,17 @@ class LLMProvider(Protocol):
 При старте любого процесса: если `ANTHROPIC_API_KEY` есть в окружении — warning в лог и `unset`.
 
 ### 5.4 Промпты
-Хранятся в `llm/prompts/` с версией и JSON-схемой ответа. Оценка возвращает `chance_pct`, `explanation`, `matches[]`, `gaps[]`, `missing_info[]`. Письма/CV — `fact_ids` на каждое утверждение.
+Пакет `llm/prompts/`: каждый промпт — модуль с константой `PROMPT = Prompt(name, version, kind, system, template, output)`.
+- `template` — `string.Template` (`$name`), безопасен для JSON-скобок в тексте; незаполненный плейсхолдер → `KeyError`, полупустой промпт не отправляется.
+- `output` — Pydantic-модель; её JSON-схема уходит в `--json-schema`, ответ валидируется ею же.
+- `prompt_version = name@version` логируется с каждым вызовом; при изменении текста или модели — повышать `version`.
+- Оценка вернёт `chance_pct`, `explanation`, `matches[]`, `gaps[]`, `missing_info[]`; письма/CV — `fact_ids` на каждое утверждение (фазы 4, 6).
+
+Виды вызовов: `parse`, `score`, `draft` + служебный `check` (`make llm-check`, потолок 3/день, не трогает слоты оценок).
+
+### 5.5 Наблюдаемость
+- `GET /llm/status` — для текущего пользователя: доступен ли провайдер, `paused_until`, расход за сегодня по видам и потолки. Показывается на странице аккаунта (PRODUCT §4.8).
+- `make llm-check` — один реальный вызов `healthcheck@v1` через гейт от имени owner (exit 0 ok / 1 сбой или пауза / 2 не настроено). На VPS — периодический healthcheck токена.
 
 ## 6. Конвейер вакансий
 

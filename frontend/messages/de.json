@@ -45,5 +45,18 @@
     "telegram_not_configured": "Der Bot ist auf dem Server noch nicht eingerichtet.",
     "validation_error": "Bitte überprüfe die Eingaben.",
     "unknown_error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "llm": {
+    "title": "Claude (KI)",
+    "active": "Aktiv.",
+    "paused": "Pausiert bis {until}: Abo-Limit erreicht. Aufgaben warten in der Warteschlange.",
+    "unavailable": "Für dieses Konto nicht verfügbar.",
+    "today": "Heute verbraucht",
+    "kinds": {
+      "parse": "Lebenslauf-Analyse",
+      "score": "Stellenbewertung",
+      "draft": "Anschreiben & CV",
+      "check": "Prüfung"
+    }
   }
 }
