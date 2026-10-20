@@ -27,7 +27,7 @@ TEST_DB_URL = get_settings().test_database_url
 BACKEND_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def migrated_db() -> None:
     """Run real migrations (down to base, then up) so tests also cover them."""
     cfg = Config(os.path.join(BACKEND_DIR, "alembic.ini"))
@@ -48,7 +48,7 @@ def _clear_caches() -> Iterator[None]:
 
 
 @pytest.fixture
-async def db() -> AsyncIterator[AsyncSession]:
+async def db(migrated_db: None) -> AsyncIterator[AsyncSession]:
     """Each test runs inside a transaction that is rolled back afterwards.
     App code may call commit() — with create_savepoint it only releases a savepoint."""
     engine = create_async_engine(TEST_DB_URL, poolclass=NullPool)

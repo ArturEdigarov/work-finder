@@ -26,6 +26,7 @@
 ```
 work-service/
   CLAUDE.md
+  README.md
   brief.md
   docs/
     PRODUCT.md
@@ -58,7 +59,10 @@ work-service/
   frontend/               # Next.js
   infra/
     docker-compose.yml
-    .env.example
+    postgres/init/        # создание тестовой БД
+  .github/workflows/      # CI: ruff, mypy, pytest (+ frontend lint/typecheck)
+  .env.example            # шаблон .env (сам .env — вне git)
+  Makefile
 ```
 
 ## 3. Процессы (контейнеры)
