@@ -159,6 +159,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/documents/cv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Cv */
+        get: operations["get_cv_documents_cv_get"];
+        put?: never;
+        /** Upload Cv */
+        post: operations["upload_cv_documents_cv_post"];
+        /** Delete Cv */
+        delete: operations["delete_cv_documents_cv_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -180,6 +199,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Body_upload_cv_documents_cv_post */
+        Body_upload_cv_documents_cv_post: {
+            /**
+             * File
+             * @description Lebenslauf as PDF or DOCX, max 5 MB
+             */
+            file: string;
+        };
         /** ConsentInfoOut */
         ConsentInfoOut: {
             /** Version */
@@ -189,6 +216,32 @@ export interface components {
         DeleteMeIn: {
             /** Password */
             password: string;
+        };
+        /** DocumentOut */
+        DocumentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Filename */
+            filename: string;
+            /** Content Type */
+            content_type: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "extracted" | "no_text";
+            /** Text Chars */
+            text_chars: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -572,6 +625,77 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LlmStatusOut"];
                 };
+            };
+        };
+    };
+    get_cv_documents_cv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+        };
+    };
+    upload_cv_documents_cv_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_cv_documents_cv_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_cv_documents_cv_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

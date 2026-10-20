@@ -1,3 +1,4 @@
+import base64
 import json
 from typing import Any
 
@@ -45,3 +46,24 @@ class EncryptedJSON(TypeDecorator[Any]):
 
     def process_result_value(self, value: str | None, dialect: Dialect) -> Any:
         return None if value is None else json.loads(get_cipher().decrypt(value, self.context))
+
+
+class EncryptedBytes(TypeDecorator[bytes]):
+    """Binary payloads (uploaded files). Stored as encrypted base64 text."""
+
+    impl = Text
+    cache_ok = True
+
+    def __init__(self, context: str) -> None:
+        super().__init__()
+        self.context = context
+
+    def process_bind_param(self, value: bytes | None, dialect: Dialect) -> str | None:
+        if value is None:
+            return None
+        return get_cipher().encrypt(base64.b64encode(value).decode(), self.context)
+
+    def process_result_value(self, value: str | None, dialect: Dialect) -> bytes | None:
+        return (
+            None if value is None else base64.b64decode(get_cipher().decrypt(value, self.context))
+        )

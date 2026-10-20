@@ -61,3 +61,13 @@ class LlmStatusOut(BaseModel):
     paused_until: datetime | None
     day: date
     usage: list[LlmKindUsageOut]
+
+
+class DocumentOut(BaseModel):
+    id: uuid.UUID
+    filename: str
+    content_type: str
+    size_bytes: int
+    status: Literal["extracted", "no_text"]
+    text_chars: int
+    created_at: datetime

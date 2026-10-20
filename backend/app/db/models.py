@@ -16,7 +16,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, Timestamps, UUIDPk
-from app.db.types import EncryptedString
+from app.db.types import EncryptedBytes, EncryptedString
 
 
 class Role(enum.StrEnum):
@@ -123,3 +123,27 @@ class LlmState(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+class DocumentStatus(enum.StrEnum):
+    EXTRACTED = "extracted"  # text is available
+    NO_TEXT = "no_text"  # e.g. a scanned PDF — ask for DOCX / text PDF
+
+
+class Document(UUIDPk, Base):
+    """Uploaded file (Lebenslauf). File and extracted text are encrypted at rest."""
+
+    __tablename__ = "documents"
+    __table_args__ = (CheckConstraint("status IN ('extracted', 'no_text')", name="status_valid"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[str] = mapped_column(String(16), default="cv")
+    filename: Mapped[str] = mapped_column("filename_enc", EncryptedString("documents.filename"))
+    content_type: Mapped[str] = mapped_column(String(100))
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    file: Mapped[bytes] = mapped_column("file_enc", EncryptedBytes("documents.file"))
+    text: Mapped[str | None] = mapped_column("text_enc", EncryptedString("documents.text"))
+    status: Mapped[str] = mapped_column(String(16))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
