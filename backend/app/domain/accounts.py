@@ -166,6 +166,10 @@ async def link_telegram(db: AsyncSession, *, token: str, chat_id: int) -> User:
     return user
 
 
+async def user_by_chat(db: AsyncSession, chat_id: int) -> User | None:
+    return await db.scalar(select(User).where(User.telegram_chat_id == chat_id))
+
+
 async def unlink_telegram(db: AsyncSession, user: User) -> None:
     user.telegram_chat_id = None
     await audit(db, user.id, "account.telegram_unlinked")

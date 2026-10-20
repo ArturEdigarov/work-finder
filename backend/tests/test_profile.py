@@ -149,7 +149,7 @@ async def test_parse_builds_profile(client: AsyncClient, db: AsyncSession, env: 
     assert types.count("skill") == 2 and "experience" in types
 
     p = await env.profile(user_id)
-    assert [q["field"] for q in p.suggested_questions or []] == ["desired_role", "driving_license"]
+    assert [q["field"] for q in profile.open_questions(p)] == ["desired_role", "driving_license"]
 
 
 async def test_reparse_keeps_user_facts(client: AsyncClient, db: AsyncSession, env: Env) -> None:

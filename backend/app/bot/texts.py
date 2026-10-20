@@ -1,6 +1,56 @@
 """Bot messages. Locale comes from the linked account, else from Telegram's language_code."""
 
 TEXTS: dict[str, dict[str, str]] = {
+    "profile_ready": {
+        "ru": "✅ Профиль готов: {facts} фактов из твоего Lebenslauf. Проверить и поправить можно на сайте во вкладке «Профиль».",
+        "uk": "✅ Профіль готовий: {facts} фактів із твого Lebenslauf. Перевірити й виправити можна на сайті у вкладці «Профіль».",
+        "de": "✅ Profil fertig: {facts} Fakten aus deinem Lebenslauf. Prüfen und korrigieren kannst du sie auf der Website unter „Profil“.",
+        "en": "✅ Profile ready: {facts} facts from your CV. You can review and fix them on the website under “Profile”.",
+    },
+    "questions_intro": {
+        "ru": "Пара вопросов, чтобы точнее подбирать вакансии (осталось: {count}). Отвечай обычным сообщением.",
+        "uk": "Кілька питань, щоб точніше підбирати вакансії (залишилось: {count}). Відповідай звичайним повідомленням.",
+        "de": "Ein paar Fragen, damit die Stellen besser passen (offen: {count}). Antworte einfach mit einer Nachricht.",
+        "en": "A few questions so the jobs fit better ({count} left). Just reply with a message.",
+    },
+    "question": {
+        "ru": "❓ {question}",
+        "uk": "❓ {question}",
+        "de": "❓ {question}",
+        "en": "❓ {question}",
+    },
+    "skip_button": {"ru": "Пропустить", "uk": "Пропустити", "de": "Überspringen", "en": "Skip"},
+    "answer_saved": {
+        "ru": "Сохранил ✅",
+        "uk": "Зберіг ✅",
+        "de": "Gespeichert ✅",
+        "en": "Saved ✅",
+    },
+    "skipped": {"ru": "Пропущено.", "uk": "Пропущено.", "de": "Übersprungen.", "en": "Skipped."},
+    "all_answered": {
+        "ru": "Вопросов больше нет 🎉 Профиль можно посмотреть на сайте.",
+        "uk": "Питань більше немає 🎉 Профіль можна переглянути на сайті.",
+        "de": "Keine offenen Fragen mehr 🎉 Dein Profil findest du auf der Website.",
+        "en": "No more questions 🎉 Your profile is on the website.",
+    },
+    "no_questions": {
+        "ru": "Открытых вопросов нет. Когда появятся вакансии, они придут сюда.",
+        "uk": "Відкритих питань немає. Коли з'являться вакансії, вони прийдуть сюди.",
+        "de": "Keine offenen Fragen. Passende Stellen kommen hierher, sobald es sie gibt.",
+        "en": "No open questions. Matching jobs will arrive here once there are any.",
+    },
+    "no_profile": {
+        "ru": "Профиля ещё нет. Загрузи Lebenslauf на сайте, и я задам пару вопросов.",
+        "uk": "Профілю ще немає. Завантаж Lebenslauf на сайті, і я поставлю кілька питань.",
+        "de": "Noch kein Profil. Lade deinen Lebenslauf auf der Website hoch, dann frage ich nach.",
+        "en": "No profile yet. Upload your CV on the website and I'll ask a few questions.",
+    },
+    "not_linked": {
+        "ru": "Этот чат не привязан. Открой сайт → Аккаунт → Telegram → «Создать ссылку».",
+        "uk": "Цей чат не прив'язано. Відкрий сайт → Акаунт → Telegram → «Створити посилання».",
+        "de": "Dieser Chat ist nicht verknüpft. Website → Konto → Telegram → „Link erstellen“.",
+        "en": "This chat isn't linked. Website → Account → Telegram → “Create link”.",
+    },
     "llm_rate_limited": {
         "ru": "⏸ Лимит Claude исчерпан, продолжу позже (примерно в {until}). Вакансии копятся в очереди.",
         "uk": "⏸ Ліміт Claude вичерпано, продовжу пізніше (приблизно о {until}). Вакансії накопичуються в черзі.",
@@ -40,7 +90,7 @@ TEXTS: dict[str, dict[str, str]] = {
 }
 
 
-def t(key: str, locale: str | None, **params: str) -> str:
+def t(key: str, locale: str | None, **params: object) -> str:
     variants = TEXTS[key]
     lang = (locale or "en").split("-")[0]
     text = variants.get(lang, variants["en"])

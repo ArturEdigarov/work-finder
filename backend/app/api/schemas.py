@@ -80,9 +80,37 @@ class FactOut(BaseModel):
     source: Literal["cv", "user_answer", "user_edit"]
 
 
+class QuestionOut(BaseModel):
+    id: str
+    field: str
+    question: str
+    status: Literal["open", "answered", "dismissed"]
+
+
 class ProfileOut(BaseModel):
     status: Literal["queued", "parsing", "ready", "failed", "unavailable"]
     version: int
     parsed_at: datetime | None
     prompt_version: str | None
     facts: list[FactOut]
+    questions: list[QuestionOut]
+
+
+FactType = Literal[
+    "personal", "location", "profession", "desired_role", "experience", "education",
+    "skill", "language", "certificate", "driving_license", "other", "answer",
+]  # fmt: skip
+FactValue = dict[str, str | list[str] | None]
+
+
+class AnswerIn(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
+
+
+class FactIn(BaseModel):
+    type: FactType
+    value: FactValue
+
+
+class FactUpdateIn(BaseModel):
+    value: FactValue

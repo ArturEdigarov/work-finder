@@ -1,5 +1,6 @@
 """Service → Telegram messages that are not tied to a chat update (e.g. LLM limit reached)."""
 
+import uuid
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
 
@@ -8,9 +9,11 @@ from aiogram import Bot
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.bot.questions import question_message
 from app.bot.texts import t
 from app.core.config import Settings, get_settings
 from app.db.models import Role, User
+from app.domain import profile as profile_domain
 
 log = structlog.get_logger()
 
@@ -50,3 +53,31 @@ class TelegramAdminNotifier:
         finally:
             await bot.session.close()
         log.info("admin_notified", key=key, recipients=len(recipients))
+
+
+async def notify_profile_ready(
+    session_factory: SessionFactory, user_id: uuid.UUID, settings: Settings | None = None
+) -> None:
+    """After a CV parse: "profile ready" + the first open question, if the chat is linked."""
+    settings = settings or get_settings()
+    token = settings.telegram_bot_token
+    if token is None or not token.get_secret_value():
+        return
+    async with session_factory() as db:
+        user = await db.get(User, user_id)
+        p = await profile_domain.get_profile(db, user_id)
+        if user is None or user.telegram_chat_id is None or p is None:
+            return
+        chat_id, locale = user.telegram_chat_id, user.locale
+        facts, open_qs = len(p.facts), profile_domain.open_questions(p)
+
+    bot = Bot(token.get_secret_value())
+    try:
+        await bot.send_message(chat_id, t("profile_ready", locale, facts=facts))
+        if open_qs:
+            await bot.send_message(chat_id, t("questions_intro", locale, count=len(open_qs)))
+            text, keyboard = question_message(open_qs[0], locale)
+            await bot.send_message(chat_id, text, reply_markup=keyboard)
+    finally:
+        await bot.session.close()
+    log.info("profile_ready_notified", user_id=str(user_id), questions=len(open_qs))

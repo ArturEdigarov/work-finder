@@ -1,6 +1,7 @@
 import enum
 import uuid
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy import (
     BigInteger,
@@ -180,8 +181,9 @@ class Profile(UUIDPk, Timestamps, Base):
     facts: Mapped[list[dict[str, object]]] = mapped_column(
         "facts_enc", EncryptedJSON("profiles.facts"), default=list
     )
-    # Raw `missing_info` from the last parse; phase 2.4 turns it into questions.
-    suggested_questions: Mapped[list[dict[str, str]] | None] = mapped_column(
+    # Questions about gaps: [{"id": "q_…", "field", "question", "status": open|answered|
+    # dismissed, "fact_ids": [...]}]. Column/AAD names are historical — keep them stable.
+    questions: Mapped[list[dict[str, Any]] | None] = mapped_column(
         "suggested_questions_enc", EncryptedJSON("profiles.suggested_questions")
     )
     source_document_id: Mapped[uuid.UUID | None] = mapped_column(

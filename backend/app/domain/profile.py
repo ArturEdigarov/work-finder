@@ -5,6 +5,7 @@ facts and must reference their ids. Re-parsing replaces facts with `source == "c
 keeps what the user answered or edited.
 """
 
+import hashlib
 import secrets
 import uuid
 from collections.abc import Callable
@@ -17,6 +18,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import DocumentStatus, Profile, ProfileStatus, User
+from app.domain.accounts import AccountError
 from app.domain.documents import current_cv
 from app.llm.gate import LLMDeferred, LLMForbidden, LLMGate
 from app.llm.prompts import cv_parse
@@ -61,6 +63,167 @@ def facts_from_parse(out: cv_parse.CvParseOut) -> list[Fact]:
     return facts
 
 
+# --- questions about gaps -----------------------------------------------------------------
+
+Question = dict[str, Any]
+FACT_TYPES = (
+    "personal", "location", "profession", "desired_role", "experience", "education",
+    "skill", "language", "certificate", "driving_license", "other", "answer",
+)  # fmt: skip
+MAX_TEXT = 2000
+
+
+def new_question_id() -> str:
+    return f"q_{secrets.token_hex(4)}"
+
+
+def _legacy_question_id(q: dict[str, Any]) -> str:
+    digest = hashlib.sha256(f"{q.get('field')}|{q.get('question')}".encode()).hexdigest()
+    return f"q_{digest[:8]}"
+
+
+def questions_of(profile: Profile) -> list[Question]:
+    """Questions with ids and statuses (older rows stored only field + question)."""
+    normalized = []
+    for q in profile.questions or []:
+        normalized.append(
+            {
+                # Legacy rows have no id: derive a stable one, so two reads agree on it.
+                "id": q.get("id") or _legacy_question_id(q),
+                "field": q.get("field", ""),
+                "question": q.get("question", ""),
+                "status": q.get("status", "open"),
+                "fact_ids": q.get("fact_ids", []),
+            }
+        )
+    return normalized
+
+
+def open_questions(profile: Profile) -> list[Question]:
+    return [q for q in questions_of(profile) if q["status"] == "open"]
+
+
+def merge_questions(existing: list[Question], suggested: list[dict[str, str]]) -> list[Question]:
+    """After a parse: answered/dismissed stay (history), old open ones are replaced, and a
+    field the user already handled is not asked again."""
+    handled = [q for q in existing if q["status"] != "open"]
+    handled_fields = {q["field"] for q in handled}
+    fresh = [
+        {
+            "id": new_question_id(),
+            "field": m["field"],
+            "question": m["question"],
+            "status": "open",
+            "fact_ids": [],
+        }
+        for m in suggested
+        if m["field"] not in handled_fields
+    ]
+    return handled + fresh
+
+
+async def _owned_profile(db: AsyncSession, user_id: uuid.UUID) -> Profile:
+    profile = await get_profile(db, user_id)
+    if profile is None:
+        raise AccountError("no_profile")
+    return profile
+
+
+def _find(items: list[dict[str, Any]], item_id: str, error: str) -> dict[str, Any]:
+    for item in items:
+        if item["id"] == item_id:
+            return item
+    raise AccountError(error)
+
+
+def _facts_from_answer(question: Question, text: str) -> list[Fact]:
+    if question["field"] in ("desired_role", "desired_roles"):
+        roles = [r.strip() for r in text.replace(";", ",").split(",") if r.strip()]
+        return [_fact("desired_role", {"name": r}, source="user_answer") for r in roles]
+    value = {"field": question["field"], "question": question["question"], "text": text}
+    return [_fact("answer", value, source="user_answer")]
+
+
+async def answer_question(
+    db: AsyncSession, user_id: uuid.UUID, question_id: str, text: str
+) -> Profile:
+    text = text.strip()[:MAX_TEXT]
+    if not text:
+        raise AccountError("empty_answer")
+    profile = await _owned_profile(db, user_id)
+    questions = questions_of(profile)
+    question = _find(questions, question_id, "question_not_found")
+    if question["status"] != "open":
+        raise AccountError("question_closed")
+    facts = _facts_from_answer(question, text)
+    question.update(status="answered", fact_ids=[f["id"] for f in facts])
+    profile.questions = questions
+    profile.facts = [*profile.facts, *facts]
+    await db.flush()
+    return profile
+
+
+async def dismiss_question(db: AsyncSession, user_id: uuid.UUID, question_id: str) -> Profile:
+    profile = await _owned_profile(db, user_id)
+    questions = questions_of(profile)
+    question = _find(questions, question_id, "question_not_found")
+    if question["status"] == "open":
+        question["status"] = "dismissed"
+    profile.questions = questions
+    await db.flush()
+    return profile
+
+
+# --- manual fact editing -------------------------------------------------------------------
+
+
+def _clean_value(value: dict[str, Any]) -> dict[str, Any]:
+    clean: dict[str, Any] = {}
+    for key, item in value.items():
+        if isinstance(item, str) and item.strip():
+            clean[str(key)[:50]] = item.strip()[:MAX_TEXT]
+        elif isinstance(item, list):
+            texts = [str(x).strip()[:MAX_TEXT] for x in item if str(x).strip()]
+            if texts:
+                clean[str(key)[:50]] = texts[:50]
+    if not clean:
+        raise AccountError("empty_fact")
+    return clean
+
+
+async def add_fact(
+    db: AsyncSession, user_id: uuid.UUID, type_: str, value: dict[str, Any]
+) -> Profile:
+    if type_ not in FACT_TYPES:
+        raise AccountError("unknown_fact_type")
+    profile = await _owned_profile(db, user_id)
+    profile.facts = [*profile.facts, _fact(type_, _clean_value(value), source="user_edit")]
+    await db.flush()
+    return profile
+
+
+async def update_fact(
+    db: AsyncSession, user_id: uuid.UUID, fact_id: str, value: dict[str, Any]
+) -> Profile:
+    """The id stays the same (letters may reference it); the fact becomes the user's own,
+    so a re-parse no longer overwrites it."""
+    profile = await _owned_profile(db, user_id)
+    facts = [dict(f) for f in profile.facts]
+    fact = _find(facts, fact_id, "fact_not_found")
+    fact.update(value=_clean_value(value), source="user_edit")
+    profile.facts = facts
+    await db.flush()
+    return profile
+
+
+async def delete_fact(db: AsyncSession, user_id: uuid.UUID, fact_id: str) -> Profile:
+    profile = await _owned_profile(db, user_id)
+    _find(profile.facts, fact_id, "fact_not_found")
+    profile.facts = [f for f in profile.facts if f["id"] != fact_id]
+    await db.flush()
+    return profile
+
+
 async def get_profile(db: AsyncSession, user_id: uuid.UUID) -> Profile | None:
     return await db.scalar(select(Profile).where(Profile.user_id == user_id))
 
@@ -85,17 +248,18 @@ async def _set_status(session_factory: SessionFactory, user_id: uuid.UUID, statu
             await db.commit()
 
 
-async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: uuid.UUID) -> None:
+async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: uuid.UUID) -> bool:
     """Parse the user's current CV into facts. Called by the `parse_cv` task.
 
-    Re-raises `LLMDeferred` / `LLMUnavailable` so the queue retries later.
+    Returns True when the profile became ready. Re-raises `LLMDeferred` / `LLMUnavailable`
+    so the queue retries later.
     """
     async with session_factory() as db:
         user = await db.get(User, user_id)
         document = await current_cv(db, user_id)
         if user is None or document is None or document.status != DocumentStatus.EXTRACTED:
             log.info("cv_parse_skipped", user_id=str(user_id))
-            return
+            return False
         document_id, text, locale = document.id, document.text or "", user.locale
         profile = await mark_queued(db, user_id)
         profile.status = ProfileStatus.PARSING
@@ -113,18 +277,18 @@ async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: 
         raise
     except LLMForbidden:
         await _set_status(session_factory, user_id, ProfileStatus.UNAVAILABLE)
-        return
+        return False
     except LLMInvalidOutput:
         await _set_status(session_factory, user_id, ProfileStatus.FAILED)
         log.warning("cv_parse_invalid_output", user_id=str(user_id))
-        return
+        return False
 
     new_facts = facts_from_parse(result.data)
     if not new_facts:
         # A CV with text always yields something; an empty answer is a model failure.
         await _set_status(session_factory, user_id, ProfileStatus.FAILED)
         log.warning("cv_parse_empty", user_id=str(user_id))
-        return
+        return False
 
     async with session_factory() as db:
         latest = await current_cv(db, user_id)
@@ -137,13 +301,15 @@ async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: 
                 # A new upload queued its own parse; without a CV there is nothing to do.
                 stale.status = ProfileStatus.QUEUED if latest else ProfileStatus.FAILED
                 await db.commit()
-            return
+            return False
         stored = await get_profile(db, user_id)
         assert stored is not None
         profile = stored
         kept = [f for f in profile.facts if f.get("source") != "cv"]
         profile.facts = new_facts + kept
-        profile.suggested_questions = [m.model_dump() for m in result.data.missing_info]
+        profile.questions = merge_questions(
+            questions_of(profile), [m.model_dump() for m in result.data.missing_info]
+        )
         profile.source_document_id = document_id
         profile.prompt_version = req.prompt_version
         profile.version += 1
@@ -154,9 +320,10 @@ async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: 
             "cv_parsed",
             user_id=str(user_id),
             facts=len(profile.facts),
-            questions=len(profile.suggested_questions),
+            questions=len(open_questions(profile)),
             version=profile.version,
         )
+    return True
 
 
 async def export_profile(db: AsyncSession, user_id: uuid.UUID) -> dict[str, Any] | None:
@@ -168,5 +335,5 @@ async def export_profile(db: AsyncSession, user_id: uuid.UUID) -> dict[str, Any]
         "version": profile.version,
         "parsed_at": profile.parsed_at.isoformat() if profile.parsed_at else None,
         "facts": profile.facts,
-        "suggested_questions": profile.suggested_questions,
+        "questions": questions_of(profile),
     }

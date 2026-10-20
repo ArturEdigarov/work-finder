@@ -6,18 +6,28 @@ so the API, the bot and the worker share it.
 
 import uuid
 
+import structlog
 from procrastinate.exceptions import AlreadyEnqueued
 
+from app.bot.notifier import notify_profile_ready
 from app.db.session import get_sessionmaker
 from app.domain import profile
 from app.llm.gate import get_gate
 from app.workers.queue import queue_app
 from app.workers.retry import llm_retry
 
+log = structlog.get_logger()
+
 
 @queue_app.task(name="parse_cv", retry=llm_retry)
 async def parse_cv(user_id: str) -> None:
-    await profile.run_cv_parse(get_sessionmaker(), get_gate(), uuid.UUID(user_id))
+    uid = uuid.UUID(user_id)
+    if await profile.run_cv_parse(get_sessionmaker(), get_gate(), uid):
+        try:
+            await notify_profile_ready(get_sessionmaker(), uid)
+        except Exception:
+            # The profile is saved; a lost Telegram message must not fail (and re-run) the parse.
+            log.exception("profile_ready_notify_failed", user_id=user_id)
 
 
 async def enqueue_parse_cv(user_id: uuid.UUID) -> None:

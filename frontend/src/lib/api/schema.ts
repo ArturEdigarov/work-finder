@@ -178,6 +178,112 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Profile */
+        get: operations["get_profile_profile_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reparse
+         * @description Parse the current CV again (e.g. after a failure). Costs one `parse` call.
+         */
+        post: operations["reparse_profile_parse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/questions/{question_id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer */
+        post: operations["answer_profile_questions__question_id__answer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/questions/{question_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss */
+        post: operations["dismiss_profile_questions__question_id__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/facts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Fact */
+        post: operations["add_fact_profile_facts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile/facts/{fact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Fact */
+        delete: operations["delete_fact_profile_facts__fact_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Fact */
+        patch: operations["update_fact_profile_facts__fact_id__patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -199,6 +305,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AnswerIn */
+        AnswerIn: {
+            /** Text */
+            text: string;
+        };
         /** Body_upload_cv_documents_cv_post */
         Body_upload_cv_documents_cv_post: {
             /**
@@ -243,6 +354,41 @@ export interface components {
              */
             created_at: string;
         };
+        /** FactIn */
+        FactIn: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "personal" | "location" | "profession" | "desired_role" | "experience" | "education" | "skill" | "language" | "certificate" | "driving_license" | "other" | "answer";
+            /** Value */
+            value: {
+                [key: string]: string | string[] | null;
+            };
+        };
+        /** FactOut */
+        FactOut: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Value */
+            value: {
+                [key: string]: unknown;
+            };
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "cv" | "user_answer" | "user_edit";
+        };
+        /** FactUpdateIn */
+        FactUpdateIn: {
+            /** Value */
+            value: {
+                [key: string]: string | string[] | null;
+            };
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -285,6 +431,38 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** ProfileOut */
+        ProfileOut: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "parsing" | "ready" | "failed" | "unavailable";
+            /** Version */
+            version: number;
+            /** Parsed At */
+            parsed_at: string | null;
+            /** Prompt Version */
+            prompt_version: string | null;
+            /** Facts */
+            facts: components["schemas"]["FactOut"][];
+            /** Questions */
+            questions: components["schemas"]["QuestionOut"][];
+        };
+        /** QuestionOut */
+        QuestionOut: {
+            /** Id */
+            id: string;
+            /** Field */
+            field: string;
+            /** Question */
+            question: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "answered" | "dismissed";
         };
         /** RegisterIn */
         RegisterIn: {
@@ -696,6 +874,211 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_profile_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+        };
+    };
+    reparse_profile_parse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+        };
+    };
+    answer_profile_questions__question_id__answer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_profile_questions__question_id__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_fact_profile_facts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FactIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_fact_profile_facts__fact_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_fact_profile_facts__fact_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FactUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
