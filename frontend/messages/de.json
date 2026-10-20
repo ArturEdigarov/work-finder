@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "work-finder",
+    "loading": "Wird geladen…",
+    "logout": "Abmelden",
+    "language": "Sprache"
+  },
+  "auth": {
+    "loginTitle": "Anmelden",
+    "registerTitle": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "passwordHint": "Mindestens {min} Zeichen",
+    "submitLogin": "Anmelden",
+    "submitRegister": "Konto erstellen",
+    "toRegister": "Noch kein Konto? Registrieren",
+    "toLogin": "Schon ein Konto? Anmelden",
+    "consent": "Ich willige in die Verarbeitung meiner personenbezogenen Daten (Lebenslauf, Kontaktdaten) zur Stellensuche ein. Die Daten werden verschlüsselt in der EU gespeichert und können jederzeit exportiert oder vollständig gelöscht werden. Version der Einwilligung: {version}."
+  },
+  "account": {
+    "title": "Konto",
+    "email": "E-Mail",
+    "role": "Rolle",
+    "telegramTitle": "Telegram-Bot",
+    "telegramLinked": "Telegram ist verknüpft.",
+    "telegramNotLinked": "Telegram ist nicht verknüpft. Stellenkarten werden an den Bot gesendet.",
+    "telegramLink": "Telegram verknüpfen",
+    "telegramLinkHint": "Öffne den Link und tippe innerhalb von {minutes} Min. auf „Start“.",
+    "telegramUnlink": "Trennen",
+    "dataTitle": "Meine Daten (DSGVO)",
+    "export": "Alle meine Daten herunterladen (JSON)",
+    "deleteTitle": "Konto löschen",
+    "deleteHint": "Dein Konto und alle Daten werden endgültig gelöscht.",
+    "deleteConfirm": "Konto und alle Daten wirklich löschen? Das kann nicht rückgängig gemacht werden.",
+    "delete": "Endgültig löschen"
+  },
+  "errors": {
+    "invalid_credentials": "E-Mail oder Passwort ist falsch.",
+    "email_taken": "Diese E-Mail ist bereits registriert.",
+    "consent_required": "Die Einwilligung zur Datenverarbeitung ist erforderlich.",
+    "password_too_short": "Das Passwort ist zu kurz.",
+    "unsupported_locale": "Diese Sprache wird nicht unterstützt.",
+    "rate_limited": "Zu viele Versuche. Bitte warte eine Minute.",
+    "invalid_password": "Falsches Passwort.",
+    "telegram_not_configured": "Der Bot ist auf dem Server noch nicht eingerichtet.",
+    "validation_error": "Bitte überprüfe die Eingaben.",
+    "unknown_error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  }
+}

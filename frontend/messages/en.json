@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "work-finder",
+    "loading": "Loading…",
+    "logout": "Log out",
+    "language": "Language"
+  },
+  "auth": {
+    "loginTitle": "Log in",
+    "registerTitle": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least {min} characters",
+    "submitLogin": "Log in",
+    "submitRegister": "Create account",
+    "toRegister": "No account yet? Sign up",
+    "toLogin": "Already have an account? Log in",
+    "consent": "I consent to the processing of my personal data (CV, contact details) for job matching. Data is stored encrypted in the EU and can be exported or fully deleted at any time. Consent version: {version}."
+  },
+  "account": {
+    "title": "Account",
+    "email": "Email",
+    "role": "Role",
+    "telegramTitle": "Telegram bot",
+    "telegramLinked": "Telegram is linked.",
+    "telegramNotLinked": "Telegram is not linked. Vacancy cards will be sent to the bot.",
+    "telegramLink": "Link Telegram",
+    "telegramLinkHint": "Open the link and press “Start” within {minutes} min.",
+    "telegramUnlink": "Unlink",
+    "dataTitle": "My data (GDPR)",
+    "export": "Download all my data (JSON)",
+    "deleteTitle": "Delete account",
+    "deleteHint": "Your account and all data will be deleted permanently.",
+    "deleteConfirm": "Really delete your account and all data? This cannot be undone.",
+    "delete": "Delete permanently"
+  },
+  "errors": {
+    "invalid_credentials": "Wrong email or password.",
+    "email_taken": "This email is already registered.",
+    "consent_required": "Consent to data processing is required.",
+    "password_too_short": "The password is too short.",
+    "unsupported_locale": "This language is not supported.",
+    "rate_limited": "Too many attempts. Please wait a minute.",
+    "invalid_password": "Wrong password.",
+    "telegram_not_configured": "The bot is not configured on the server yet.",
+    "validation_error": "Please check the form fields.",
+    "unknown_error": "Something went wrong. Please try again."
+  }
+}

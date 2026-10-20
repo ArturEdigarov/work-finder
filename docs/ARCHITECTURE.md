@@ -17,7 +17,7 @@
 | Гео | офлайн-справочник PLZ/городов DE (GeoNames) + haversine | радиус без платных API |
 | Язык текста | lingua-py | офлайн-определение языка |
 | LLM | `LLMProvider` → `ClaudeCodeSubscriptionProvider` (сейчас), `AnthropicApiProvider` (позже) | см. §5 |
-| Frontend | Next.js (App Router) + TypeScript, openapi-typescript, next-intl | |
+| Frontend | Next.js (App Router) + TypeScript, openapi-typescript + openapi-fetch, next-intl | типизированный клиент API из OpenAPI |
 | Инструменты | uv, ruff, mypy, pytest (Python); pnpm, eslint, prettier (TS) | |
 | Инфра | Docker Compose; Mac → VPS Hetzner (ЕС) | одинаковое окружение |
 
@@ -170,6 +170,10 @@ class JobSource(Protocol):
 ## 8. Бот и сайт
 
 Оба — тонкие адаптеры над `domain`-сервисами. Действия `apply`, `edit`, `skip` реализованы один раз в `domain`; состояние общее. Бот хранит связь сообщение → `match_id`, чтобы карточки обновлялись при действии на сайте.
+
+**Сайт ↔ API.** Next проксирует `/api/*` на FastAPI (`rewrites` в `next.config.ts`, `API_URL`), поэтому сайт и API — один origin: httpOnly-cookie сессии работает без CORS. Типы клиента генерируются `make gen-types` → `frontend/src/lib/api/schema.ts` (коммитится, чтобы CI не зависел от бэкенда; после изменения API — перегенерировать).
+
+**i18n сайта.** next-intl без префикса языка в URL: язык — cookie `NEXT_LOCALE` → `Accept-Language` → `de`. При входе cookie выставляется из `User.locale`, смена языка в аккаунте сохраняется в профиль. Тексты — `frontend/messages/{de,en,ru,uk}.json`, коды ошибок бэкенда переводятся в `errors.*`.
 
 ## 9. Безопасность и GDPR
 

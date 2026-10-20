@@ -25,7 +25,7 @@ test:
 
 lint:
 	cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy app
-	cd frontend && pnpm lint && pnpm typecheck
+	cd frontend && pnpm lint && pnpm format:check && pnpm typecheck
 
 check: lint test
 

@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "work-finder",
+    "loading": "Загрузка…",
+    "logout": "Выйти",
+    "language": "Язык"
+  },
+  "auth": {
+    "loginTitle": "Вход",
+    "registerTitle": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "passwordHint": "Минимум {min} символов",
+    "submitLogin": "Войти",
+    "submitRegister": "Создать аккаунт",
+    "toRegister": "Нет аккаунта? Зарегистрироваться",
+    "toLogin": "Уже есть аккаунт? Войти",
+    "consent": "Я согласен(на) на обработку моих персональных данных (резюме, контакты) для подбора вакансий. Данные хранятся в ЕС в зашифрованном виде, их можно выгрузить или полностью удалить в любой момент. Версия согласия: {version}."
+  },
+  "account": {
+    "title": "Аккаунт",
+    "email": "Email",
+    "role": "Роль",
+    "telegramTitle": "Telegram-бот",
+    "telegramLinked": "Telegram привязан.",
+    "telegramNotLinked": "Telegram не привязан. Карточки вакансий будут приходить в бот.",
+    "telegramLink": "Привязать Telegram",
+    "telegramLinkHint": "Открой ссылку и нажми «Start» в течение {minutes} мин.",
+    "telegramUnlink": "Отвязать",
+    "dataTitle": "Мои данные (GDPR)",
+    "export": "Скачать все мои данные (JSON)",
+    "deleteTitle": "Удалить аккаунт",
+    "deleteHint": "Аккаунт и все данные будут удалены безвозвратно.",
+    "deleteConfirm": "Точно удалить аккаунт и все данные? Это необратимо.",
+    "delete": "Удалить навсегда"
+  },
+  "errors": {
+    "invalid_credentials": "Неверный email или пароль.",
+    "email_taken": "Этот email уже зарегистрирован.",
+    "consent_required": "Нужно согласие на обработку данных.",
+    "password_too_short": "Пароль слишком короткий.",
+    "unsupported_locale": "Этот язык не поддерживается.",
+    "rate_limited": "Слишком много попыток. Подожди минуту.",
+    "invalid_password": "Неверный пароль.",
+    "telegram_not_configured": "Бот ещё не настроен на сервере.",
+    "validation_error": "Проверь правильность заполнения полей.",
+    "unknown_error": "Что-то пошло не так. Попробуй ещё раз."
+  }
+}
