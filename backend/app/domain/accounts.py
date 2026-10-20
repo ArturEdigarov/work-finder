@@ -174,7 +174,8 @@ async def unlink_telegram(db: AsyncSession, user: User) -> None:
 
 async def export_user_data(db: AsyncSession, user: User) -> dict[str, Any]:
     """GDPR Art. 15/20: everything we store about the user, in readable form."""
-    from app.domain.documents import export_documents  # documents imports this module
+    from app.domain.documents import export_documents  # these modules import this one
+    from app.domain.profile import export_profile
 
     consents = (await db.scalars(select(Consent).where(Consent.user_id == user.id))).all()
     usage = (
@@ -200,6 +201,7 @@ async def export_user_data(db: AsyncSession, user: User) -> dict[str, Any]:
         ],
         "llm_usage": [{"day": u.day.isoformat(), "kind": u.kind, "count": u.count} for u in usage],
         "documents": await export_documents(db, user.id),
+        "profile": await export_profile(db, user.id),
     }
 
 

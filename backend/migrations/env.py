@@ -20,8 +20,19 @@ def database_url() -> str:
     return config.attributes.get("database_url") or get_settings().database_url
 
 
+def include_object(obj, name, type_, reflected, compare_to) -> bool:  # type: ignore[no-untyped-def]
+    # procrastinate's tables are managed by its vendored schema (0004), not by our models:
+    # without this, autogenerate would emit DROP TABLE for the job queue.
+    return not (name or "").startswith(("procrastinate_", "idx_procrastinate"))
+
+
 def do_run_migrations(connection) -> None:  # type: ignore[no-untyped-def]
-    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        include_object=include_object,
+    )
     with context.begin_transaction():
         context.run_migrations()
 

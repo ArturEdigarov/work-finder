@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager  # noqa: E402
 
 from fastapi import FastAPI  # noqa: E402
 
-from app.api.routers import auth, documents, llm, me  # noqa: E402
+from app.api.routers import auth, documents, llm, me, profile  # noqa: E402
 from app.core.logging import configure_logging  # noqa: E402
 from app.workers.queue import queue_app  # noqa: E402
 
@@ -26,6 +26,7 @@ def create_app() -> FastAPI:
     app.include_router(me.router)
     app.include_router(llm.router)
     app.include_router(documents.router)
+    app.include_router(profile.router)
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:

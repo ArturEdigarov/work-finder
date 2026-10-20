@@ -16,7 +16,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, Timestamps, UUIDPk
-from app.db.types import EncryptedBytes, EncryptedString
+from app.db.types import EncryptedBytes, EncryptedJSON, EncryptedString
 
 
 class Role(enum.StrEnum):
@@ -147,3 +147,46 @@ class Document(UUIDPk, Base):
     text: Mapped[str | None] = mapped_column("text_enc", EncryptedString("documents.text"))
     status: Mapped[str] = mapped_column(String(16))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ProfileStatus(enum.StrEnum):
+    QUEUED = "queued"  # waiting for the worker (or for an LLM pause to end)
+    PARSING = "parsing"
+    READY = "ready"
+    FAILED = "failed"  # the model returned unusable output twice
+    UNAVAILABLE = "unavailable"  # no LLM provider for this user (subscription is owner-only)
+
+
+class Profile(UUIDPk, Timestamps, Base):
+    """Structured profile = a list of facts. Letters and CV variants reference fact ids.
+
+    `facts`: [{"id": "f_ab12cd34", "type": "experience", "value": {...},
+               "source": "cv" | "user_answer" | "user_edit"}]
+    Re-parsing replaces only `source == "cv"` facts.
+    """
+
+    __tablename__ = "profiles"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('queued', 'parsing', 'ready', 'failed', 'unavailable')",
+            name="status_valid",
+        ),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True
+    )
+    status: Mapped[str] = mapped_column(String(16))
+    facts: Mapped[list[dict[str, object]]] = mapped_column(
+        "facts_enc", EncryptedJSON("profiles.facts"), default=list
+    )
+    # Raw `missing_info` from the last parse; phase 2.4 turns it into questions.
+    suggested_questions: Mapped[list[dict[str, str]] | None] = mapped_column(
+        "suggested_questions_enc", EncryptedJSON("profiles.suggested_questions")
+    )
+    source_document_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("documents.id", ondelete="SET NULL")
+    )
+    prompt_version: Mapped[str | None] = mapped_column(String(32))
+    version: Mapped[int] = mapped_column(Integer, default=0)
+    parsed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

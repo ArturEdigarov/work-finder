@@ -71,3 +71,18 @@ class DocumentOut(BaseModel):
     status: Literal["extracted", "no_text"]
     text_chars: int
     created_at: datetime
+
+
+class FactOut(BaseModel):
+    id: str
+    type: str
+    value: dict[str, object]
+    source: Literal["cv", "user_answer", "user_edit"]
+
+
+class ProfileOut(BaseModel):
+    status: Literal["queued", "parsing", "ready", "failed", "unavailable"]
+    version: int
+    parsed_at: datetime | None
+    prompt_version: str | None
+    facts: list[FactOut]

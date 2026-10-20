@@ -6,6 +6,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from httpx import ASGITransport, AsyncClient
+from procrastinate.testing import InMemoryConnector
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -22,6 +23,7 @@ from app.core.config import get_settings
 from app.core.crypto import get_cipher
 from app.db.session import get_db
 from app.main import app
+from app.workers.queue import queue_app
 
 TEST_DB_URL = get_settings().test_database_url
 BACKEND_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -35,6 +37,14 @@ def migrated_db() -> None:
     cfg.attributes["database_url"] = TEST_DB_URL
     command.downgrade(cfg, "base")
     command.upgrade(cfg, "head")
+
+
+@pytest.fixture(autouse=True)
+def queue() -> Iterator[InMemoryConnector]:
+    """Jobs go to an in-memory queue; tests inspect `queue.jobs`."""
+    connector = InMemoryConnector()
+    with queue_app.replace_connector(connector):
+        yield connector
 
 
 @pytest.fixture(autouse=True)

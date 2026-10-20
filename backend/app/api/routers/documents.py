@@ -4,9 +4,10 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
 from app.api.deps import CurrentUser, DbSession
 from app.api.schemas import DocumentOut
-from app.db.models import Document
-from app.domain import documents
+from app.db.models import Document, DocumentStatus
+from app.domain import documents, profile
 from app.domain.accounts import AccountError
+from app.workers.tasks import enqueue_parse_cv
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -43,6 +44,10 @@ async def upload_cv(
     except AccountError as exc:
         raise HTTPException(_ERROR_STATUS.get(exc.code, 422), exc.code) from exc
     await db.commit()
+    if doc.status == DocumentStatus.EXTRACTED:
+        await profile.mark_queued(db, user.id)
+        await db.commit()  # the worker reads the CV on its own connection
+        await enqueue_parse_cv(user.id)
     return _out(doc)
 
 

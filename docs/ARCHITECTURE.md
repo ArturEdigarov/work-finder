@@ -204,6 +204,9 @@ class JobSource(Protocol):
 - У пользователя один актуальный CV: новая загрузка заменяет старую (минимизация данных).
 - **Фоновые задачи — procrastinate** (вводится в фазе 2, а не 3): `make worker`; `LLMDeferred` → задача переставляется на `retry_at`.
 - Вопросы по пробелам профиля — **сайт и бот сразу** (паритет).
+- **Профиль = список фактов** в одном зашифрованном JSON (`profiles.facts_enc`): `{id: "f_xxxxxxxx", type, value, source: cv|user_answer|user_edit}`. Типы: personal, location, profession, desired_role, experience, education, skill, language, certificate, driving_license, other. Это реализация сущности `ProfileFact` из §4 (отдельная таблица не нужна: факты читаются и пишутся вместе). Повторный разбор заменяет только `source = cv`.
+- **Разбор** — задача `parse_cv(user_id)` (всегда текущий CV, queueing lock: одна в очереди на пользователя), промпт `cv_parse@v1`: только явно написанное, уровень языка только если указан, CV — недоверенные данные в `<cv>`, вопросы (`missing_info`, ≤ 6) на языке аккаунта и без защищённых признаков (AGG). Статусы профиля: queued → parsing → ready | failed | unavailable (не-owner без API-провайдера).
+- `migrations/env.py` исключает объекты `procrastinate_*` из autogenerate (иначе он генерирует DROP очереди).
 
 ## 8b. Фоновые задачи (procrastinate)
 - `app/workers/queue.py` — `queue_app` (psycopg, DSN из `DATABASE_URL`); API открывает его в lifespan и только ставит задачи; `make worker` (`app/workers/main.py`, concurrency 2) их выполняет — единственный процесс, вызывающий LLM.
