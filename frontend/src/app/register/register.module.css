@@ -1,0 +1,50 @@
+.consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--muted);
+  padding: 12px 14px;
+  background: var(--paper);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.consent input {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  border: 1.5px solid var(--muted);
+  border-radius: 4px;
+  background: var(--sheet);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+.consent input::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border: solid var(--on-ink);
+  border-width: 0 0 2px 2px;
+  transform: rotate(-45deg) scale(0);
+  margin-top: -2px;
+  transition: transform 120ms;
+}
+
+.consent input:checked {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.consent input:checked::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+.consent:has(input:checked) {
+  color: var(--graphite);
+}

@@ -191,6 +191,12 @@ class JobSource(Protocol):
 
 **i18n сайта.** next-intl без префикса языка в URL: язык — cookie `NEXT_LOCALE` → `Accept-Language` → `de`. При входе cookie выставляется из `User.locale`, смена языка в аккаунте сохраняется в профиль. Тексты — `frontend/messages/{de,en,ru,uk}.json`, коды ошибок бэкенда переводятся в `errors.*`.
 
+**Визуальная система «Bewerbungsmappe».** Образы из мира соискателя в Германии: лист A4, текстовыделитель на совпадениях, чернильный штамп с процентом, регистры папки Leitz как вкладки.
+- Токены — `frontend/src/app/globals.css` (`--paper`, `--sheet`, `--graphite`, `--ink` королевский синий, `--marker` жёлтый, `--danger`, `--ok`; тёмная тема через `prefers-color-scheme`). Шрифты — Fira Sans / Fira Sans Extra Condensed (кириллица для RU/UK).
+- Единственная «громкая» анимация — `HeroSheet` на входе/регистрации (маркер → пробел → штамп); `prefers-reduced-motion` показывает финальное состояние. Остальное движение — только в ответ на действия (подтверждения, Telegram-связка).
+- Тексты — от лица пользователя, кнопки называют действие; ошибки объясняют, что сделать.
+- Превью-сборка рядом с `pnpm dev`: `NEXT_DIST_DIR=.next-preview pnpm build && NEXT_DIST_DIR=.next-preview pnpm start -p 3100` (не ломает `.next` dev-сервера).
+
 ## 9. Безопасность и GDPR
 
 - Field-level шифрование (AES-GCM) для контактов, резюме, профиля, документов; ключ — в env, не в репозитории.

@@ -3,60 +3,108 @@
     "appName": "work-finder",
     "loading": "Loading…",
     "logout": "Log out",
-    "language": "Language"
+    "language": "Language",
+    "copy": "Copy link",
+    "copied": "Copied"
+  },
+  "hero": {
+    "title": "Jobs that fit your CV.",
+    "lead": "work-finder reads job ads for you, shows where you fit and where you don't, and writes the cover letter. Using only facts from your CV.",
+    "stamp": "match",
+    "gap": "not in your CV",
+    "sheetLabel": "Example: a job ad with CV matches highlighted, 78 % match"
   },
   "auth": {
     "loginTitle": "Log in",
-    "registerTitle": "Sign up",
+    "loginLead": "Good to see you again.",
+    "registerTitle": "Create account",
+    "registerLead": "Next you upload your CV, and work-finder does the rest.",
     "email": "Email",
     "password": "Password",
-    "passwordHint": "At least {min} characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "passwordRemaining": "{count, plural, one {# more character} other {# more characters}}",
+    "passwordOk": "Long enough",
     "submitLogin": "Log in",
     "submitRegister": "Create account",
-    "toRegister": "No account yet? Sign up",
-    "toLogin": "Already have an account? Log in",
+    "pending": "One moment…",
+    "toRegister": "No account yet?",
+    "toRegisterLink": "Create one",
+    "toLogin": "Already registered?",
+    "toLoginLink": "Log in",
     "consent": "I consent to the processing of my personal data (CV, contact details) for job matching. Data is stored encrypted in the EU and can be exported or fully deleted at any time. Consent version: {version}."
   },
   "account": {
-    "title": "Account",
+    "title": "Your account",
+    "tabs": {
+      "account": "Account",
+      "telegram": "Telegram",
+      "llm": "Claude",
+      "data": "Data"
+    },
+    "tabsLabel": "Account sections",
     "email": "Email",
     "role": "Role",
-    "telegramTitle": "Telegram bot",
-    "telegramLinked": "Telegram is linked.",
-    "telegramNotLinked": "Telegram is not linked. Vacancy cards will be sent to the bot.",
-    "telegramLink": "Link Telegram",
-    "telegramLinkHint": "Open the link and press “Start” within {minutes} min.",
-    "telegramUnlink": "Unlink",
-    "dataTitle": "My data (GDPR)",
-    "export": "Download all my data (JSON)",
-    "deleteTitle": "Delete account",
-    "deleteHint": "Your account and all data will be deleted permanently.",
-    "deleteConfirm": "Really delete your account and all data? This cannot be undone.",
-    "delete": "Delete permanently"
+    "roles": {
+      "owner": "Service owner",
+      "user": "User",
+      "admin": "Administrator"
+    },
+    "languageHint": "Language of the website and bot messages.",
+    "languageSaved": "Saved"
   },
-  "errors": {
-    "invalid_credentials": "Wrong email or password.",
-    "email_taken": "This email is already registered.",
-    "consent_required": "Consent to data processing is required.",
-    "password_too_short": "The password is too short.",
-    "unsupported_locale": "This language is not supported.",
-    "rate_limited": "Too many attempts. Please wait a minute.",
-    "invalid_password": "Wrong password.",
-    "telegram_not_configured": "The bot is not configured on the server yet.",
-    "validation_error": "Please check the form fields.",
-    "unknown_error": "Something went wrong. Please try again."
+  "telegram": {
+    "linked": "Telegram is connected. New jobs arrive as cards in the bot, and you can act on them right there.",
+    "unlink": "Disconnect",
+    "intro": "Connect the bot to get matching jobs with their score straight in Telegram.",
+    "step1": "Create a link",
+    "step2": "Tap “Start” in the bot",
+    "step3": "This page confirms the connection on its own",
+    "create": "Create link",
+    "open": "Open in Telegram",
+    "expiresIn": "Valid for {time}",
+    "expired": "The link has expired. Create a new one.",
+    "waiting": "Waiting for confirmation from Telegram…",
+    "success": "Connected"
   },
   "llm": {
-    "title": "Claude (AI)",
-    "active": "Active.",
-    "paused": "Paused until {until}: subscription limit reached. Tasks are queued.",
+    "title": "Claude",
+    "ready": "Ready",
+    "paused": "Paused until {until}",
+    "pausedText": "Your Claude subscription limit is reached. Tasks wait in the queue and continue automatically afterwards.",
     "unavailable": "Not available for this account.",
     "today": "Used today",
+    "usage": "{used} of {cap}",
+    "note": "Daily limits protect your Claude subscription. They reset at midnight.",
     "kinds": {
-      "parse": "CV parsing",
-      "score": "Vacancy scoring",
+      "parse": "Reading your CV",
+      "score": "Scoring jobs",
       "draft": "Letters & CV",
       "check": "Health check"
     }
+  },
+  "data": {
+    "exportTitle": "Download your data",
+    "exportText": "Everything work-finder stores about you, as a JSON file.",
+    "exportButton": "Download",
+    "deleteTitle": "Delete account",
+    "deleteText": "Your account, CV and all data are deleted immediately and permanently.",
+    "deletePassword": "Password to confirm",
+    "deleteButton": "Delete account",
+    "deleteConfirm": "Delete permanently",
+    "deleteCancel": "Cancel",
+    "deleteAsk": "Are you sure? This cannot be undone."
+  },
+  "errors": {
+    "invalid_credentials": "Wrong email or password.",
+    "email_taken": "This email is already registered. Log in instead.",
+    "consent_required": "Confirm the consent to data processing.",
+    "password_too_short": "The password is too short.",
+    "unsupported_locale": "This language is not supported.",
+    "rate_limited": "Too many attempts. Wait a minute.",
+    "invalid_password": "The password is wrong.",
+    "telegram_not_configured": "The bot is not set up on the server yet.",
+    "validation_error": "Check the highlighted fields.",
+    "unknown_error": "That didn't work. Try again."
   }
 }

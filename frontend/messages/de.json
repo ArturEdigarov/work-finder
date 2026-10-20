@@ -3,60 +3,108 @@
     "appName": "work-finder",
     "loading": "Wird geladen…",
     "logout": "Abmelden",
-    "language": "Sprache"
+    "language": "Sprache",
+    "copy": "Link kopieren",
+    "copied": "Kopiert"
+  },
+  "hero": {
+    "title": "Stellen, die zu deinem Lebenslauf passen.",
+    "lead": "work-finder liest Stellenanzeigen für dich, zeigt, wo du passt und wo nicht, und schreibt das Anschreiben. Nur mit Fakten aus deinem Lebenslauf.",
+    "stamp": "passt",
+    "gap": "fehlt im Lebenslauf",
+    "sheetLabel": "Beispiel: eine Stellenanzeige, Übereinstimmungen mit dem Lebenslauf markiert, 78 % Passung"
   },
   "auth": {
     "loginTitle": "Anmelden",
-    "registerTitle": "Registrieren",
+    "loginLead": "Schön, dass du wieder da bist.",
+    "registerTitle": "Konto erstellen",
+    "registerLead": "Danach lädst du deinen Lebenslauf hoch, den Rest erledigt work-finder.",
     "email": "E-Mail",
     "password": "Passwort",
-    "passwordHint": "Mindestens {min} Zeichen",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "passwordRemaining": "Noch {count, plural, one {# Zeichen} other {# Zeichen}}",
+    "passwordOk": "Lang genug",
     "submitLogin": "Anmelden",
     "submitRegister": "Konto erstellen",
-    "toRegister": "Noch kein Konto? Registrieren",
-    "toLogin": "Schon ein Konto? Anmelden",
+    "pending": "Einen Moment…",
+    "toRegister": "Noch kein Konto?",
+    "toRegisterLink": "Konto erstellen",
+    "toLogin": "Schon registriert?",
+    "toLoginLink": "Anmelden",
     "consent": "Ich willige in die Verarbeitung meiner personenbezogenen Daten (Lebenslauf, Kontaktdaten) zur Stellensuche ein. Die Daten werden verschlüsselt in der EU gespeichert und können jederzeit exportiert oder vollständig gelöscht werden. Version der Einwilligung: {version}."
   },
   "account": {
-    "title": "Konto",
+    "title": "Dein Konto",
+    "tabs": {
+      "account": "Konto",
+      "telegram": "Telegram",
+      "llm": "Claude",
+      "data": "Daten"
+    },
+    "tabsLabel": "Kontobereiche",
     "email": "E-Mail",
     "role": "Rolle",
-    "telegramTitle": "Telegram-Bot",
-    "telegramLinked": "Telegram ist verknüpft.",
-    "telegramNotLinked": "Telegram ist nicht verknüpft. Stellenkarten werden an den Bot gesendet.",
-    "telegramLink": "Telegram verknüpfen",
-    "telegramLinkHint": "Öffne den Link und tippe innerhalb von {minutes} Min. auf „Start“.",
-    "telegramUnlink": "Trennen",
-    "dataTitle": "Meine Daten (DSGVO)",
-    "export": "Alle meine Daten herunterladen (JSON)",
-    "deleteTitle": "Konto löschen",
-    "deleteHint": "Dein Konto und alle Daten werden endgültig gelöscht.",
-    "deleteConfirm": "Konto und alle Daten wirklich löschen? Das kann nicht rückgängig gemacht werden.",
-    "delete": "Endgültig löschen"
+    "roles": {
+      "owner": "Inhaber des Dienstes",
+      "user": "Nutzer",
+      "admin": "Administrator"
+    },
+    "languageHint": "Sprache der Website und der Bot-Nachrichten.",
+    "languageSaved": "Gespeichert"
   },
-  "errors": {
-    "invalid_credentials": "E-Mail oder Passwort ist falsch.",
-    "email_taken": "Diese E-Mail ist bereits registriert.",
-    "consent_required": "Die Einwilligung zur Datenverarbeitung ist erforderlich.",
-    "password_too_short": "Das Passwort ist zu kurz.",
-    "unsupported_locale": "Diese Sprache wird nicht unterstützt.",
-    "rate_limited": "Zu viele Versuche. Bitte warte eine Minute.",
-    "invalid_password": "Falsches Passwort.",
-    "telegram_not_configured": "Der Bot ist auf dem Server noch nicht eingerichtet.",
-    "validation_error": "Bitte überprüfe die Eingaben.",
-    "unknown_error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  "telegram": {
+    "linked": "Telegram ist verbunden. Neue Stellen kommen als Karten in den Bot, du reagierst direkt dort.",
+    "unlink": "Verbindung trennen",
+    "intro": "Verbinde den Bot, dann bekommst du passende Stellen mit Bewertung direkt in Telegram.",
+    "step1": "Link erstellen",
+    "step2": "Im Bot auf „Start“ tippen",
+    "step3": "Diese Seite bestätigt die Verbindung von selbst",
+    "create": "Link erstellen",
+    "open": "In Telegram öffnen",
+    "expiresIn": "Gültig noch {time}",
+    "expired": "Der Link ist abgelaufen. Erstelle einen neuen.",
+    "waiting": "Warte auf Bestätigung aus Telegram…",
+    "success": "Verbunden"
   },
   "llm": {
-    "title": "Claude (KI)",
-    "active": "Aktiv.",
-    "paused": "Pausiert bis {until}: Abo-Limit erreicht. Aufgaben warten in der Warteschlange.",
+    "title": "Claude",
+    "ready": "Bereit",
+    "paused": "Pause bis {until}",
+    "pausedText": "Das Limit deines Claude-Abos ist erreicht. Aufgaben warten in der Warteschlange und laufen danach automatisch weiter.",
     "unavailable": "Für dieses Konto nicht verfügbar.",
     "today": "Heute verbraucht",
+    "usage": "{used} von {cap}",
+    "note": "Tageslimits schützen dein Claude-Abo. Sie setzen sich um Mitternacht zurück.",
     "kinds": {
-      "parse": "Lebenslauf-Analyse",
-      "score": "Stellenbewertung",
+      "parse": "Lebenslauf lesen",
+      "score": "Stellen bewerten",
       "draft": "Anschreiben & CV",
       "check": "Prüfung"
     }
+  },
+  "data": {
+    "exportTitle": "Daten herunterladen",
+    "exportText": "Alles, was work-finder über dich speichert, als JSON-Datei.",
+    "exportButton": "Herunterladen",
+    "deleteTitle": "Konto löschen",
+    "deleteText": "Konto, Lebenslauf und alle Daten werden sofort und endgültig gelöscht.",
+    "deletePassword": "Passwort zur Bestätigung",
+    "deleteButton": "Konto löschen",
+    "deleteConfirm": "Endgültig löschen",
+    "deleteCancel": "Abbrechen",
+    "deleteAsk": "Wirklich? Das lässt sich nicht rückgängig machen."
+  },
+  "errors": {
+    "invalid_credentials": "E-Mail oder Passwort ist falsch.",
+    "email_taken": "Diese E-Mail ist bereits registriert. Melde dich an.",
+    "consent_required": "Bestätige die Einwilligung zur Datenverarbeitung.",
+    "password_too_short": "Das Passwort ist zu kurz.",
+    "unsupported_locale": "Diese Sprache wird nicht unterstützt.",
+    "rate_limited": "Zu viele Versuche. Warte eine Minute.",
+    "invalid_password": "Das Passwort stimmt nicht.",
+    "telegram_not_configured": "Der Bot ist auf dem Server noch nicht eingerichtet.",
+    "validation_error": "Prüfe die markierten Felder.",
+    "unknown_error": "Das hat nicht geklappt. Versuche es noch einmal."
   }
 }

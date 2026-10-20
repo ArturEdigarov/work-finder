@@ -1,96 +1,214 @@
-/* Functional placeholder styles. The real design is done separately by the owner. */
+/* Design tokens — "Bewerbungsmappe": office paper, royal-blue ink, highlighter, register tabs. */
 :root {
-  --fg: #171717;
-  --bg: #ffffff;
-  --muted: #6b7280;
-  --danger: #b91c1c;
-  --border: #d4d4d8;
+  --paper: #eef0f3;
+  --sheet: #ffffff;
+  --graphite: #1a2030;
+  --muted: #5e6678;
+  --line: #d5d9e1;
+  --ink: #2442c9;
+  --ink-strong: #1a32a0;
+  --ink-weak: #e3e8fb;
+  --on-ink: #ffffff;
+  --marker: #ffe14d;
+  --on-marker: #1a2030;
+  --danger: #b83220;
+  --danger-weak: #fbe9e6;
+  --ok: #1f7a4d;
+  --ok-weak: #e3f3ea;
+
+  --sheet-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgb(26 32 48 / 0.45);
+  --radius-sheet: 3px;
+  --radius-control: 6px;
+
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: 2.5rem;
+  --step-4: 3.5rem;
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fg: #ededed;
-    --bg: #0a0a0a;
-    --muted: #a1a1aa;
-    --danger: #f87171;
-    --border: #3f3f46;
+    --paper: #0f131a;
+    --sheet: #171c26;
+    --graphite: #e6e9f0;
+    --muted: #98a0b3;
+    --line: #2a3140;
+    --ink: #8ea2ff;
+    --ink-strong: #b3c0ff;
+    --ink-weak: #1e2747;
+    --on-ink: #0f131a;
+    --marker: #e3c83a;
+    --on-marker: #1a2030;
+    --danger: #f07a66;
+    --danger-weak: #3a1c18;
+    --ok: #5cc48f;
+    --ok-weak: #15301f;
+    --sheet-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+    color-scheme: dark;
   }
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  color: var(--fg);
-  background: var(--bg);
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  line-height: 1.5;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--graphite);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
 }
 
-.container {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 32px 16px;
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), var(--font-text), sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
 }
 
-form,
-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
+p {
+  margin: 0;
+  text-wrap: pretty;
 }
 
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+a {
+  color: var(--ink);
+  text-underline-offset: 0.2em;
 }
 
-label.checkbox {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 8px;
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
-input,
-select,
-button {
+/* --- Controls ---------------------------------------------------------------------- */
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field > span:first-child,
+.field > label:first-child {
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
   font: inherit;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: transparent;
   color: inherit;
+  padding: 11px 12px;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  transition: border-color 120ms;
 }
 
-button {
+.input:hover {
+  border-color: var(--muted);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--ink-weak);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-weight: 600;
+  padding: 11px 18px;
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
   cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 120ms,
+    transform 80ms;
 }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: default;
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.button-primary {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--ink-strong);
+}
+
+.button-quiet {
+  background: transparent;
+  color: var(--graphite);
+  border-color: var(--line);
+}
+
+.button-quiet:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+.button-danger {
+  background: var(--danger);
+  color: var(--sheet);
 }
 
 .hint {
   color: var(--muted);
-  font-size: 0.9em;
+  font-size: var(--step--1);
 }
 
-.error {
+.error-text {
   color: var(--danger);
+  font-size: var(--step--1);
+  font-weight: 500;
 }
 
-.row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

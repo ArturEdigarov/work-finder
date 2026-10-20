@@ -1,0 +1,104 @@
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+/* Mobile: promise → form → sheet. Desktop: promise + sheet left, form right. */
+.grid {
+  display: grid;
+  gap: 28px;
+  grid-template-areas:
+    "promise"
+    "form"
+    "desk";
+}
+
+.promise {
+  grid-area: promise;
+  max-width: 34rem;
+}
+
+.headline {
+  font-size: clamp(2.25rem, 6vw, var(--step-4));
+  font-weight: 700;
+}
+
+.lead {
+  margin-top: 14px;
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 32rem;
+}
+
+.desk {
+  grid-area: desk;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 12px;
+}
+
+.formSheet {
+  grid-area: form;
+  align-self: start;
+  background: var(--sheet);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--sheet-shadow);
+  padding: 28px 24px;
+  display: grid;
+  gap: 18px;
+  border-top: 4px solid var(--ink);
+}
+
+.formTitle {
+  font-size: var(--step-2);
+}
+
+.formTitle + p {
+  margin-top: -10px;
+}
+
+.switch {
+  font-size: var(--step--1);
+  color: var(--muted);
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 920px) {
+  .page {
+    padding: 28px 32px 64px;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      "promise form"
+      "desk form";
+    column-gap: 72px;
+    row-gap: 36px;
+  }
+
+  .desk {
+    justify-content: flex-start;
+  }
+
+  .formSheet {
+    padding: 36px 36px 28px;
+    position: sticky;
+    top: 28px;
+  }
+}

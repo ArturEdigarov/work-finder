@@ -5,10 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
-import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { AuthShell } from "@/components/AuthShell";
+import { PasswordField } from "@/components/PasswordField";
 import { isLocale } from "@/i18n/config";
 import { api, errorCode } from "@/lib/api/client";
 import { useErrorMessage } from "@/lib/useErrorMessage";
+
+import styles from "./register.module.css";
 
 // Must match `password_min_length` in backend/app/core/config.py.
 const PASSWORD_MIN_LENGTH = 12;
@@ -42,8 +45,8 @@ export default function RegisterPage() {
         locale: isLocale(locale) ? locale : "de",
       },
     });
-    setPending(false);
     if (!data) {
+      setPending(false);
       setError(errorMessage(errorCode(error)));
       return;
     }
@@ -52,30 +55,32 @@ export default function RegisterPage() {
   }
 
   return (
-    <>
-      <div className="row">
-        <h1>{t("registerTitle")}</h1>
-        <LocaleSwitcher />
-      </div>
-      <form onSubmit={submit}>
-        <label>
-          {t("email")}
-          <input name="email" type="email" autoComplete="email" required />
-        </label>
-        <label>
-          {t("password")}
+    <AuthShell
+      title={t("registerTitle")}
+      lead={t("registerLead")}
+      footer={
+        <>
+          {t("toLogin")} <Link href="/login">{t("toLoginLink")}</Link>
+        </>
+      }
+    >
+      <form onSubmit={submit} className="field" style={{ gap: 16 }}>
+        <label className="field">
+          <span>{t("email")}</span>
           <input
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            minLength={PASSWORD_MIN_LENGTH}
+            name="email"
+            type="email"
+            className="input"
+            autoComplete="email"
             required
           />
-          <span className="hint">
-            {t("passwordHint", { min: PASSWORD_MIN_LENGTH })}
-          </span>
         </label>
-        <label className="checkbox">
+        <PasswordField
+          label={t("password")}
+          autoComplete="new-password"
+          minLength={PASSWORD_MIN_LENGTH}
+        />
+        <label className={styles.consent}>
           <input
             name="consent"
             type="checkbox"
@@ -84,12 +89,19 @@ export default function RegisterPage() {
           />
           <span>{t("consent", { version: consentVersion ?? "…" })}</span>
         </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={pending || !consentVersion}>
-          {t("submitRegister")}
+        {error && (
+          <p className="error-text" role="alert">
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          className="button button-primary"
+          disabled={pending || !consentVersion}
+        >
+          {pending ? t("pending") : t("submitRegister")}
         </button>
-        <Link href="/login">{t("toLogin")}</Link>
       </form>
-    </>
+    </AuthShell>
   );
 }

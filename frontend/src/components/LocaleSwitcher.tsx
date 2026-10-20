@@ -14,9 +14,12 @@ import {
 type Props = {
   /** Extra side effect, e.g. saving the locale to the account. */
   onChange?: (locale: Locale) => Promise<void>;
+  /** Hide the visible label (header usage). */
+  compact?: boolean;
+  id?: string;
 };
 
-export function LocaleSwitcher({ onChange }: Props) {
+export function LocaleSwitcher({ onChange, compact, id = "locale" }: Props) {
   const t = useTranslations("common");
   const current = useLocale();
   const router = useRouter();
@@ -29,9 +32,17 @@ export function LocaleSwitcher({ onChange }: Props) {
   }
 
   return (
-    <label>
-      {t("language")}{" "}
-      <select value={current} onChange={(e) => void change(e.target.value)}>
+    <label className={compact ? undefined : "field"} htmlFor={id}>
+      <span className={compact ? "visually-hidden" : undefined}>
+        {t("language")}
+      </span>
+      <select
+        id={id}
+        className="input"
+        style={compact ? { width: "auto", padding: "7px 10px" } : undefined}
+        value={current}
+        onChange={(e) => void change(e.target.value)}
+      >
         {locales.map((locale) => (
           <option key={locale} value={locale}>
             {localeNames[locale]}
