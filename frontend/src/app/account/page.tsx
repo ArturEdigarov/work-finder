@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import { LlmStatus, type LlmStatusData } from "@/components/LlmStatus";
-import { Wordmark } from "@/components/Wordmark";
+import { AppHeader } from "@/components/AppHeader";
 import { isLocale, setLocaleCookie } from "@/i18n/config";
 import { api, type User } from "@/lib/api/client";
 
@@ -92,11 +92,6 @@ export default function AccountPage() {
     }
   }
 
-  async function logout() {
-    await api.POST("/auth/logout");
-    router.replace("/login");
-  }
-
   if (!user) {
     return (
       <div className={styles.page}>
@@ -112,12 +107,7 @@ export default function AccountPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.topbar}>
-        <Wordmark />
-        <button className="button button-quiet" onClick={() => void logout()}>
-          {tc("logout")}
-        </button>
-      </header>
+      <AppHeader />
 
       <div className={styles.heading}>
         <h1>{t("title")}</h1>

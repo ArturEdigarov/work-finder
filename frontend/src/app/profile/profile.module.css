@@ -1,0 +1,481 @@
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 64px;
+}
+
+.heading {
+  margin-bottom: 28px;
+  max-width: 44rem;
+}
+
+.heading h1 {
+  font-size: clamp(2rem, 5vw, var(--step-3));
+}
+
+.heading p {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Mobile: CV card + questions, then the sheet. Desktop: sheet left, sticky aside right. */
+.layout {
+  display: grid;
+  gap: 24px;
+}
+
+.aside {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+@media (min-width: 980px) {
+  .page {
+    padding: 28px 32px 80px;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 40px;
+  }
+
+  .main {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .aside {
+    grid-column: 2;
+    position: sticky;
+    top: 24px;
+  }
+}
+
+/* --- aside cards ------------------------------------------------------------------ */
+
+.card {
+  background: var(--sheet);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--sheet-shadow);
+  padding: 22px 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.card h2 {
+  font-size: var(--step-1);
+}
+
+.drop {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 28px 16px;
+  text-align: center;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background-color 120ms;
+}
+
+.drop:hover,
+.drop[data-dragging="true"] {
+  border-color: var(--ink);
+  background: var(--ink-weak);
+}
+
+.drop:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.drop svg {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-bottom: 4px;
+}
+
+.drop[data-compact="true"] {
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: var(--step--1);
+  border-width: 1.5px;
+}
+
+.fakeLink {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.file {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.fileIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 52px;
+  border-radius: 3px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fileName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  display: grid;
+  gap: 4px;
+}
+
+.working {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+}
+
+.warn {
+  color: var(--danger);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+/* Questions: what needs the user's attention — the highlighter edge. */
+.questions {
+  border-left: 5px solid var(--marker);
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--marker);
+  color: var(--on-marker);
+  font-family: var(--font-text);
+  font-size: var(--step--1);
+  vertical-align: 3px;
+}
+
+.qList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.qItem {
+  display: grid;
+  gap: 8px;
+}
+
+.qText {
+  font-weight: 600;
+}
+
+.qItem textarea {
+  resize: vertical;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* --- the Lebenslauf sheet --------------------------------------------------------- */
+
+.sheet {
+  background: var(--sheet);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--sheet-shadow);
+  padding: 28px 20px;
+  display: grid;
+  gap: 30px;
+}
+
+@media (min-width: 640px) {
+  .sheet {
+    padding: 48px 52px;
+  }
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.sheetHead {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--graphite);
+}
+
+.headLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.headLine[data-type="personal"] p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.05;
+}
+
+.headLine[data-type="profession"] p {
+  font-size: var(--step-1);
+  font-weight: 500;
+}
+
+.headLine[data-type="location"] p {
+  color: var(--muted);
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+}
+
+.section h3 {
+  font-size: var(--step-1);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+
+/* tabular Lebenslauf: dates | content | actions */
+.entry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px 20px;
+}
+
+@media (min-width: 640px) {
+  .entry {
+    grid-template-columns: 9.5rem 1fr auto;
+  }
+}
+
+.when {
+  color: var(--muted);
+  font-size: var(--step--1);
+  padding-top: 2px;
+  white-space: nowrap;
+}
+
+.what {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-weight: 600;
+}
+
+.details {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 2px;
+}
+
+.source {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.entry[data-user="true"] .rowTitle {
+  background: linear-gradient(var(--marker), var(--marker)) no-repeat 0 85% /
+    100% 35%;
+  justify-self: start;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 4px;
+  align-self: start;
+}
+
+.actions button {
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  color: var(--ink);
+  background: var(--ink-weak);
+}
+
+.actions .danger {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* Show row actions on hover/focus with a pointer; always on touch screens. */
+@media (hover: hover) {
+  .entry .actions,
+  .headLine .actions {
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+
+  .entry:hover .actions,
+  .entry:focus-within .actions,
+  .headLine:hover .actions,
+  .headLine:focus-within .actions {
+    opacity: 1;
+  }
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--sheet);
+  overflow: hidden;
+}
+
+.chip[data-user="true"] {
+  border-color: var(--marker);
+  box-shadow: inset 0 -3px 0 var(--marker);
+}
+
+.chipLabel,
+.chipRemove {
+  font: inherit;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chipLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 4px 5px 13px;
+}
+
+.chipRemove {
+  padding: 0 11px 0 6px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.chipRemove:hover {
+  color: var(--danger);
+}
+
+.level {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ink-weak);
+  color: var(--ink);
+}
+
+.addChip {
+  font: inherit;
+  font-size: var(--step--1);
+  padding: 6px 13px;
+  border: 1px dashed var(--muted);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.addChip:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.addForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.addForm input {
+  width: 14rem;
+  padding: 6px 10px;
+}
+
+.addForm button {
+  padding: 6px 14px;
+}
+
+.editor {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--paper);
+  border-radius: var(--radius-control);
+}

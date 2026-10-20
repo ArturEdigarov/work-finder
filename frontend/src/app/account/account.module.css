@@ -4,14 +4,6 @@
   padding: 20px 16px 64px;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
 .heading {
   margin-bottom: 28px;
 }

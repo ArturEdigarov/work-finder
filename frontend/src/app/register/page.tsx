@@ -50,7 +50,7 @@ export default function RegisterPage() {
       setError(errorMessage(errorCode(error)));
       return;
     }
-    router.replace("/account");
+    router.replace("/profile");
     router.refresh();
   }
 

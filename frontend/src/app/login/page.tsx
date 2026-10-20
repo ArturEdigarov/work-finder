@@ -35,7 +35,7 @@ export default function LoginPage() {
       return;
     }
     if (isLocale(data.locale)) setLocaleCookie(data.locale);
-    router.replace("/account");
+    router.replace("/profile");
     router.refresh();
   }
 

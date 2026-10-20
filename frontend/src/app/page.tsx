@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// The account page sends unauthenticated visitors to /login.
+// The profile page sends unauthenticated visitors to /login.
 export default function Home() {
-  redirect("/account");
+  redirect("/profile");
 }
