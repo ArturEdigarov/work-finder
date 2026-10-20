@@ -96,7 +96,7 @@ class AuditLog(UUIDPk, Base):
 
 
 class LlmUsage(UUIDPk, Base):
-    """Successful LLM calls per user, kind and day — enforces the daily caps."""
+    """LLM calls that reached the model, per user, kind and day (Europe/Berlin) — daily caps."""
 
     __tablename__ = "llm_usage"
     __table_args__ = (

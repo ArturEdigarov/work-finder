@@ -1,6 +1,18 @@
 """Bot messages. Locale comes from the linked account, else from Telegram's language_code."""
 
 TEXTS: dict[str, dict[str, str]] = {
+    "llm_rate_limited": {
+        "ru": "⏸ Лимит Claude исчерпан, продолжу позже (примерно в {until}). Вакансии копятся в очереди.",
+        "uk": "⏸ Ліміт Claude вичерпано, продовжу пізніше (приблизно о {until}). Вакансії накопичуються в черзі.",
+        "de": "⏸ Claude-Limit erreicht, ich mache später weiter (ca. {until}). Stellen werden in der Warteschlange gesammelt.",
+        "en": "⏸ Claude limit reached, I'll continue later (around {until}). Vacancies are queued.",
+    },
+    "llm_auth_error": {
+        "ru": "⚠️ Claude Code не авторизован (истёк вход или токен). Выполни `claude /login` (на VPS — `claude setup-token`). До этого вызовы на паузе.",
+        "uk": "⚠️ Claude Code не авторизований (сплив вхід або токен). Виконай `claude /login` (на VPS — `claude setup-token`). До того виклики на паузі.",
+        "de": "⚠️ Claude Code ist nicht angemeldet (Login oder Token abgelaufen). Führe `claude /login` aus (auf dem VPS `claude setup-token`). Bis dahin sind Aufrufe pausiert.",
+        "en": "⚠️ Claude Code is not authenticated (login or token expired). Run `claude /login` (on the VPS: `claude setup-token`). Calls are paused until then.",
+    },
     "linked": {
         "ru": "✅ Аккаунт привязан. Сюда будут приходить вакансии и уведомления.",
         "uk": "✅ Акаунт прив'язано. Сюди надходитимуть вакансії та сповіщення.",
@@ -28,7 +40,8 @@ TEXTS: dict[str, dict[str, str]] = {
 }
 
 
-def t(key: str, locale: str | None) -> str:
+def t(key: str, locale: str | None, **params: str) -> str:
     variants = TEXTS[key]
     lang = (locale or "en").split("-")[0]
-    return variants.get(lang, variants["en"])
+    text = variants.get(lang, variants["en"])
+    return text.format(**params) if params else text

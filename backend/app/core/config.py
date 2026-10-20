@@ -55,6 +55,8 @@ class Settings(BaseSettings):
     # first pause = default, then doubled per consecutive hit, capped at max.
     llm_pause_default_minutes: int = 60
     llm_pause_max_minutes: int = 300
+    # "Day" for daily caps.
+    timezone: str = "Europe/Berlin"
 
     def llm_model(self, kind: str) -> str:
         return str(getattr(self, f"llm_model_{kind}"))
