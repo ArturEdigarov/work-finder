@@ -40,6 +40,28 @@ class Settings(BaseSettings):
 
     password_min_length: int = 12
 
+    # --- LLM (see ADR-0001: subscription only, never an API key) ---
+    llm_provider: Literal["claude_code", "fake"] = "claude_code"
+    claude_bin: str = "claude"
+    llm_timeout_seconds: int = 180
+    llm_model_parse: str = "sonnet"
+    llm_model_score: str = "sonnet"
+    llm_model_draft: str = "sonnet"
+    # Our own daily caps, so the service never eats the whole subscription limit.
+    llm_daily_cap_parse: int = 5
+    llm_daily_cap_score: int = 30
+    llm_daily_cap_draft: int = 8
+    # Pause when the provider reports a limit without a reset time:
+    # first pause = default, then doubled per consecutive hit, capped at max.
+    llm_pause_default_minutes: int = 60
+    llm_pause_max_minutes: int = 300
+
+    def llm_model(self, kind: str) -> str:
+        return str(getattr(self, f"llm_model_{kind}"))
+
+    def llm_daily_cap(self, kind: str) -> int:
+        return int(getattr(self, f"llm_daily_cap_{kind}"))
+
 
 @lru_cache
 def get_settings() -> Settings:

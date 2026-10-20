@@ -1,8 +1,18 @@
 import enum
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, String, func
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, Timestamps, UUIDPk
@@ -83,3 +93,33 @@ class AuditLog(UUIDPk, Base):
     )
     action: Mapped[str] = mapped_column(String(64))
     at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class LlmUsage(UUIDPk, Base):
+    """Successful LLM calls per user, kind and day — enforces the daily caps."""
+
+    __tablename__ = "llm_usage"
+    __table_args__ = (
+        UniqueConstraint("user_id", "kind", "day", name="uq_llm_usage_user_kind_day"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    kind: Mapped[str] = mapped_column(String(16))
+    day: Mapped[date] = mapped_column(Date)
+    count: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class LlmState(Base):
+    """Per-provider pause state. One row per provider name."""
+
+    __tablename__ = "llm_state"
+
+    provider: Mapped[str] = mapped_column(String(32), primary_key=True)
+    paused_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Set when the "limit, will continue later" message was sent for the current pause.
+    notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Consecutive rate-limit hits without a successful call — drives the backoff.
+    pause_streak: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )

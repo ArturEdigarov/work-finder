@@ -15,7 +15,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.crypto import email_lookup_hash, normalize_email, token_hash
-from app.db.models import AuditLog, AuthSession, Consent, Role, TelegramLinkToken, User
+from app.db.models import (
+    AuditLog,
+    AuthSession,
+    Consent,
+    LlmUsage,
+    Role,
+    TelegramLinkToken,
+    User,
+)
 
 _hasher = PasswordHasher()  # argon2id with library defaults
 # Verified against when the user does not exist, so login timing does not reveal
@@ -167,6 +175,9 @@ async def unlink_telegram(db: AsyncSession, user: User) -> None:
 async def export_user_data(db: AsyncSession, user: User) -> dict[str, Any]:
     """GDPR Art. 15/20: everything we store about the user, in readable form."""
     consents = (await db.scalars(select(Consent).where(Consent.user_id == user.id))).all()
+    usage = (
+        await db.scalars(select(LlmUsage).where(LlmUsage.user_id == user.id).order_by(LlmUsage.day))
+    ).all()
     return {
         "exported_at": _now().isoformat(),
         "account": {
@@ -185,6 +196,7 @@ async def export_user_data(db: AsyncSession, user: User) -> dict[str, Any]:
             }
             for c in consents
         ],
+        "llm_usage": [{"day": u.day.isoformat(), "kind": u.kind, "count": u.count} for u in usage],
     }
 
 
