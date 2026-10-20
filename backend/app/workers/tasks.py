@@ -21,10 +21,11 @@ async def parse_cv(user_id: str) -> None:
 
 
 async def enqueue_parse_cv(user_id: uuid.UUID) -> None:
-    """At most one queued parse per user: it always reads the *current* CV anyway."""
+    """At most one *queued* parse per user (queueing_lock) — it reads the current CV anyway —
+    and parses of one profile never run concurrently (lock)."""
     try:
-        await parse_cv.configure(queueing_lock=f"parse_cv:{user_id}").defer_async(
-            user_id=str(user_id)
-        )
+        await parse_cv.configure(
+            queueing_lock=f"parse_cv:{user_id}", lock=f"profile:{user_id}"
+        ).defer_async(user_id=str(user_id))
     except AlreadyEnqueued:
         pass

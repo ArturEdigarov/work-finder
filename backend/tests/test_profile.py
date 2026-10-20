@@ -117,6 +117,7 @@ async def test_upload_queues_a_parse(
     user_id = await owner_with_cv(client, db)
     jobs = list(queue.jobs.values())
     assert [(j["task_name"], j["args"]) for j in jobs] == [("parse_cv", {"user_id": str(user_id)})]
+    assert jobs[0]["lock"] == f"profile:{user_id}"  # parses of one profile never overlap
     assert (await client.get("/profile")).json()["status"] == "queued"
 
     # a second upload while queued does not create a second job (queueing lock)
@@ -219,3 +220,34 @@ async def test_profile_encrypted_and_exported(
     exported = (await client.get("/me/export")).json()["profile"]
     assert exported["version"] == 1
     assert any(f["type"] == "personal" for f in exported["facts"])
+
+
+EMPTY = {k: ([] if isinstance(v, list) else None) for k, v in PARSED.items()}
+
+
+async def test_empty_answer_is_a_failure(client: AsyncClient, db: AsyncSession, env: Env) -> None:
+    user_id = await owner_with_cv(client, db)
+    env.provider.queue(EMPTY)
+    await env.parse(user_id)
+    p = await env.profile(user_id)
+    assert (p.status, p.facts, p.version) == ("failed", [], 0)
+
+
+async def test_cv_replaced_during_parse_drops_stale_result(
+    client: AsyncClient, db: AsyncSession, env: Env
+) -> None:
+    user_id = await owner_with_cv(client, db)
+
+    async def upload_while_parsing(req: Any) -> Any:
+        # the user uploads a new file while Claude is still working on the old one
+        await client.post("/documents/cv", files={"file": ("new.pdf", make_pdf(CV_LINES[:3]))})
+        return await original(req)
+
+    original = env.provider.complete
+    env.provider.complete = upload_while_parsing  # type: ignore[method-assign]
+    env.provider.queue(PARSED)
+    await env.parse(user_id)  # must not crash on the deleted document
+
+    p = await env.profile(user_id)
+    assert p.version == 0 and p.facts == []  # stale result dropped, new parse is queued
+    assert p.status == "queued"

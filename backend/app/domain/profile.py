@@ -119,12 +119,30 @@ async def run_cv_parse(session_factory: SessionFactory, gate: LLMGate, user_id: 
         log.warning("cv_parse_invalid_output", user_id=str(user_id))
         return
 
+    new_facts = facts_from_parse(result.data)
+    if not new_facts:
+        # A CV with text always yields something; an empty answer is a model failure.
+        await _set_status(session_factory, user_id, ProfileStatus.FAILED)
+        log.warning("cv_parse_empty", user_id=str(user_id))
+        return
+
     async with session_factory() as db:
+        latest = await current_cv(db, user_id)
+        if latest is None or latest.id != document_id:
+            # Replaced or deleted during the call: drop the stale result; the job queued
+            # for the new upload parses the current file.
+            log.info("cv_parse_stale", user_id=str(user_id))
+            stale = await get_profile(db, user_id)
+            if stale is not None:
+                # A new upload queued its own parse; without a CV there is nothing to do.
+                stale.status = ProfileStatus.QUEUED if latest else ProfileStatus.FAILED
+                await db.commit()
+            return
         stored = await get_profile(db, user_id)
         assert stored is not None
         profile = stored
         kept = [f for f in profile.facts if f.get("source") != "cv"]
-        profile.facts = facts_from_parse(result.data) + kept
+        profile.facts = new_facts + kept
         profile.suggested_questions = [m.model_dump() for m in result.data.missing_info]
         profile.source_document_id = document_id
         profile.prompt_version = req.prompt_version
