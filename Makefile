@@ -1,6 +1,6 @@
 COMPOSE = docker compose -f infra/docker-compose.yml --env-file .env
 
-.PHONY: db-up db-down migrate api bot web test lint check gen-types keygen llm-check
+.PHONY: db-up db-down migrate api bot web test lint check gen-types keygen llm-check worker
 
 db-up:
 	$(COMPOSE) up -d --wait
@@ -13,6 +13,9 @@ migrate:
 
 api:
 	cd backend && uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+worker:
+	cd backend && uv run python -m app.workers.main
 
 bot:
 	cd backend && uv run python -m app.bot.main

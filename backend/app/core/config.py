@@ -60,6 +60,11 @@ class Settings(BaseSettings):
     # "Day" for daily caps.
     timezone: str = "Europe/Berlin"
 
+    @property
+    def database_dsn(self) -> str:
+        """libpq DSN for psycopg (procrastinate); `database_url` is the SQLAlchemy URL."""
+        return self.database_url.replace("postgresql+asyncpg://", "postgresql://", 1)
+
     def llm_model(self, kind: str) -> str:
         return str(getattr(self, f"llm_model_{kind}"))
 

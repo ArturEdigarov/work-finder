@@ -13,6 +13,7 @@ cp .env.example .env   # then fill in; `make keygen` prints crypto keys
 make db-up             # Postgres 16 in Docker
 make migrate
 make api               # http://127.0.0.1:8000/docs
+make worker            # background jobs (CV parsing, later vacancies); the only LLM caller
 make bot               # needs TELEGRAM_BOT_TOKEN
 make web               # http://localhost:3000
 make check             # lint + tests

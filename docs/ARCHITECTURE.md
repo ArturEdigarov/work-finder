@@ -205,6 +205,13 @@ class JobSource(Protocol):
 - **Фоновые задачи — procrastinate** (вводится в фазе 2, а не 3): `make worker`; `LLMDeferred` → задача переставляется на `retry_at`.
 - Вопросы по пробелам профиля — **сайт и бот сразу** (паритет).
 
+## 8b. Фоновые задачи (procrastinate)
+- `app/workers/queue.py` — `queue_app` (psycopg, DSN из `DATABASE_URL`); API открывает его в lifespan и только ставит задачи; `make worker` (`app/workers/main.py`, concurrency 2) их выполняет — единственный процесс, вызывающий LLM.
+- Схема очереди **зафиксирована** в `migrations/sql/procrastinate-3.10.0.sql` (миграция `0004`), версия библиотеки закреплена `==3.10.0`. Обновление procrastinate — только новой ревизией с его миграциями.
+- `LLMAwareRetry` (`app/workers/retry.py`): `LLMDeferred` → повтор ровно в `retry_at` без лимита попыток; `LLMUnavailable`/сетевые ошибки → 1, 2, 4… 32 мин, до 6 попыток; `LLMInvalidOutput`, `LLMForbidden`, прочее → `failed` (не тратим лимиты).
+- Задача ставится в очередь **после** коммита данных, которые ей нужны (другое соединение).
+- Задачи тонкие: id → сервис из `domain` → commit.
+
 ## 9. Безопасность и GDPR
 
 - Field-level шифрование (AES-GCM) для контактов, резюме, профиля, документов; ключ — в env, не в репозитории.
