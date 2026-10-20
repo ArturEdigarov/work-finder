@@ -116,7 +116,10 @@ class LLMProvider(Protocol):
 Ошибки: `LLMRateLimited(reset_at | None)`, `LLMAuthError`, `LLMInvalidOutput`.
 
 ### 5.2 `ClaudeCodeSubscriptionProvider`
-- Вызывает `claude -p --output-format json` как subprocess с **очищенным env**: `ANTHROPIC_API_KEY` удаляется всегда.
+- Вызывает `claude -p --output-format json --json-schema <schema> --model <alias> --tools "" --no-session-persistence --strict-mcp-config --setting-sources ""` как subprocess с **очищенным env** (`sanitized_env()`): `ANTHROPIC_API_KEY` удаляется всегда, переменные родительской сессии Claude Code (`CLAUDECODE`, `CLAUDE_CODE_SESSION_ID`, …) тоже; `CLAUDE_CODE_OAUTH_TOKEN` сохраняется.
+- **`--bare` запрещён:** в этом режиме CLI авторизуется только через `ANTHROPIC_API_KEY`.
+- cwd — новый пустой temp-каталог (не подхватываются `CLAUDE.md` и настройки проекта); промпт — через **stdin** (персональные данные не попадают в argv / `ps`); одновременно один вызов.
+- Ответ: результат по схеме — поле `structured_output` (fallback — JSON в `result`); ошибки — `is_error`, `api_error_status` (429 → лимит, 401/403 → авторизация), текст в `result`. Время сброса лимита парсится из текста (`|<epoch>` или `resets 3pm (Europe/Berlin)`), иначе — backoff гейта.
 - Аутентификация: локально — логин Claude Code владельца; на VPS — `CLAUDE_CODE_OAUTH_TOKEN` из `claude setup-token`. Есть сообщения об ошибках 401 и об отсутствии автообновления токена → healthcheck + уведомление admin.
 - Распознаёт сообщения о лимите → `LLMRateLimited`.
 - Валидирует ответ по JSON-схеме; при невалидном ответе — одна повторная попытка, далее `LLMInvalidOutput`.
