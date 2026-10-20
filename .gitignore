@@ -1,0 +1,22 @@
+# secrets
+.env
+*.session
+*.session-journal
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# node
+node_modules/
+.next/
+frontend/openapi.json
+
+# data
+storage/
+
+.DS_Store
